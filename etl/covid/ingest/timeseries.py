@@ -11,7 +11,7 @@ from datetime import datetime
 
 
 from covid import working_directory, DATABASE_CONNECTION_STRING
-from covid.fields import reported_total_field_prefix as field_prefix
+from covid.core.fields import reported_total_field_prefix as field_prefix
 
 working_sub_directory = os.path.join(working_directory, 'timeseries')
 os.makedirs(working_sub_directory, exist_ok=True)

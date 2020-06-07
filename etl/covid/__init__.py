@@ -1,5 +1,5 @@
 import os
-import covid.logger
+import covid.core.logger
 
 working_directory = 'data'
 

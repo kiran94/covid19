@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  etl_database:
+    image: postgres:latest
+    volumes:
+      - .docker/etl/database:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${COVID_DATABASE_NAME}

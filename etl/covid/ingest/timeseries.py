@@ -11,13 +11,12 @@ from datetime import datetime
 
 
 from covid import working_directory, DATABASE_CONNECTION_STRING
+from covid.fields import reported_total_field_prefix as field_prefix
 
 working_sub_directory = os.path.join(working_directory, 'timeseries')
 os.makedirs(working_sub_directory, exist_ok=True)
 
 logger = logging.getLogger(__package__)
-
-field_prefix = 'REPORTED_TOTAL_'
 
 files = {
     'deaths': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',

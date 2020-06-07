@@ -50,6 +50,7 @@ if __name__ == "__main__":
 
         frame.rename(columns={'Long_': 'Long', 'Country_Region': 'CountryRegion', 'Province_State': 'ProvinceState'}, inplace=True)
         frame.columns = list(map(snakecase.convert, frame.columns))
+        frame['is_updated'] = True # should be used when switching to incremental loads
         frame['updated_at'] = datetime.utcnow()
 
         if frame.empty:

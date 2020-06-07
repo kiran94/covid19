@@ -11,7 +11,7 @@ from datetime import datetime
 
 
 from covid import working_directory, DATABASE_CONNECTION_STRING
-from covid.core.fields import reported_total_field_prefix as field_prefix
+from covid.core.fields import reported_totals_map
 
 working_sub_directory = os.path.join(working_directory, 'timeseries')
 os.makedirs(working_sub_directory, exist_ok=True)
@@ -57,12 +57,10 @@ if __name__ == "__main__":
         if frame.empty:
             logger.exception('', ValueError('frame was empty'))
 
-        field = field_prefix + args.source.upper()
-
         logger.info('Unpivoting Date Columns')
         pivoted = frame.melt(id_vars=['country_region', 'province_state'], var_name='date', value_name='value')
         pivoted['date'] = pivoted['date'].astype('datetime64')
-        pivoted['field'] = field
+        pivoted['field'] = reported_totals_map.get(args.source)
         pivoted = pivoted[['country_region', 'province_state', 'field', 'date', 'value']]
         pivoted['is_updated'] = True # should be used when switching to incremental loads
         pivoted['updated_at'] = datetime.utcnow()

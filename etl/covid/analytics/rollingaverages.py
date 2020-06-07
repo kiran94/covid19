@@ -5,6 +5,7 @@ from covid.core.fields import reported_daily_map, rolling_averages
 import pandas as pd
 import sqlalchemy
 from typing import List
+from covid.core.tracing import tracer, trace_command_line_arguments
 
 logger = logging.getLogger(__name__)
 
@@ -29,38 +30,45 @@ if __name__ == "__main__":
     field = reported_daily_map.get(args.source)
     target_field = rolling_averages[args.frequency][args.source]
 
-    logger.info(f'Computing {args.frequency} Averages for {field} -> {target_field}')
+    with tracer.start_span('covid.analytics.rollingaverages') as span:
+        trace_command_line_arguments(span, args)
+        span.set_tag('source_field', field)
+        span.set_tag('target_field', target_field)
 
-    engine = sqlalchemy.create_engine(DATABASE_CONNECTION_STRING)
-    frame: pd.DataFrame = pd.read_sql(f'select * from public.timeseries where field = \'{field}\'', con=engine)
+        logger.info(f'Computing {args.frequency} Averages for {field} -> {target_field}')
 
-    logger.info(f'Loaded {frame.shape[0]} rows')
+        engine = sqlalchemy.create_engine(DATABASE_CONNECTION_STRING)
+        frame: pd.DataFrame = pd.read_sql(f'select * from public.timeseries where field = \'{field}\'', con=engine)
 
-    frame['province_state'].fillna('', inplace=True)
-    grouped = frame.groupby(by=group_fields)
+        logger.info(f'Loaded {frame.shape[0]} rows')
 
-    computed: List[pd.DataFrame] = []
+        frame['province_state'].fillna('', inplace=True)
+        grouped = frame.groupby(by=group_fields)
 
-    for index, group in grouped:
-        logger.debug('Computing ' + str(index))
+        computed: List[pd.DataFrame] = []
 
-        group.sort_values(by='date', inplace=True)
+        for index, group in grouped:
+            logger.debug('Computing ' + str(index))
 
-        group['value'] = group['value'].rolling(rolling_map[args.frequency]).mean()
-        group.loc[group['province_state'] == '', 'province_state'] = None
+            group.sort_values(by='date', inplace=True)
 
-        computed.append(group)
+            group['value'] = group['value'].rolling(rolling_map[args.frequency]).mean()
+            group.loc[group['province_state'] == '', 'province_state'] = None
 
-    result = pd.concat(computed)
-    result['field'] = target_field
+            computed.append(group)
 
-    if args.console:
-        print(result)
-        print(result.dtypes)
+        result = pd.concat(computed)
+        result['field'] = target_field
 
-    if args.publish:
-        logger.info(f'Writing {result.shape[0]} rows to datastore')
+        if args.console:
+            print(result)
+            print(result.dtypes)
 
-        with engine.begin() as connection:
-            connection.execute("DELETE FROM public.timeseries WHERE field = '" + target_field + "'")
-            result.to_sql('timeseries', con=connection, if_exists='append', index=False)
+        if args.publish:
+            logger.info(f'Writing {result.shape[0]} rows to datastore')
+
+            with engine.begin() as connection:
+                connection.execute("DELETE FROM public.timeseries WHERE field = '" + target_field + "'")
+                result.to_sql('timeseries', con=connection, if_exists='append', index=False)
+
+    tracer.close()

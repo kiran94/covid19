@@ -5,6 +5,7 @@ from covid.core.fields import reported_totals_map, reported_daily_map
 import pandas as pd
 import sqlalchemy
 from typing import List
+from covid.core.tracing import tracer, trace_command_line_arguments
 
 logger = logging.getLogger(__name__)
 
@@ -22,41 +23,48 @@ if __name__ == "__main__":
     field = reported_totals_map.get(args.source)
     target_field = reported_daily_map.get(args.source)
 
-    logger.info(f'Computing Daily Totals for {field} -> {target_field}')
+    with tracer.start_span('covid.analytics.dailytotals') as span:
+        trace_command_line_arguments(span, args)
+        span.set_tag('source_field', field)
+        span.set_tag('target_field', target_field)
 
-    engine = sqlalchemy.create_engine(DATABASE_CONNECTION_STRING)
+        logger.info(f'Computing Daily Totals for {field} -> {target_field}')
 
-    frame: pd.DataFrame = pd.read_sql(f'''
-        select *
-        from public.timeseries
-        where field = \'{field}\'
-    ''', con=engine)
+        engine = sqlalchemy.create_engine(DATABASE_CONNECTION_STRING)
+
+        frame: pd.DataFrame = pd.read_sql(f'''
+            select *
+            from public.timeseries
+            where field = \'{field}\'
+        ''', con=engine)
 
 
-    logger.info(f'Loaded {frame.shape[0]} rows')
+        logger.info(f'Loaded {frame.shape[0]} rows')
 
-    frame.fillna('', inplace=True)
-    grouped = frame.groupby(by=group_fields)
+        frame.fillna('', inplace=True)
+        grouped = frame.groupby(by=group_fields)
 
-    computed: List[pd.DataFrame] = []
+        computed: List[pd.DataFrame] = []
 
-    for index, grouped in grouped:
-        logger.info('Computing ' + str(index))
-        grouped['value'] = grouped['value'] - grouped['value'].shift(+1)
-        grouped.loc[grouped['province_state'] == '', 'province_state'] = None
+        for index, grouped in grouped:
+            logger.info('Computing ' + str(index))
+            grouped['value'] = grouped['value'] - grouped['value'].shift(+1)
+            grouped.loc[grouped['province_state'] == '', 'province_state'] = None
 
-        computed.append(grouped)
+            computed.append(grouped)
 
-    result = pd.concat(computed)
-    result['field'] = target_field
+        result = pd.concat(computed)
+        result['field'] = target_field
 
-    if args.console:
-        print(result)
-        print(result.dtypes)
+        if args.console:
+            print(result)
+            print(result.dtypes)
 
-    if args.publish:
-        logger.info(f'Writing {result.shape[0]} rows to datastore')
+        if args.publish:
+            logger.info(f'Writing {result.shape[0]} rows to datastore')
 
-        with engine.begin() as connection:
-            connection.execute("DELETE FROM public.timeseries WHERE field = '" + target_field + "'")
-            result.to_sql('timeseries', con=connection, if_exists='append', index=False)
+            with engine.begin() as connection:
+                connection.execute("DELETE FROM public.timeseries WHERE field = '" + target_field + "'")
+                result.to_sql('timeseries', con=connection, if_exists='append', index=False)
+
+    tracer.close()

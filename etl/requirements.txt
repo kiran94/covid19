@@ -4,3 +4,6 @@ SQLAlchemy
 pg8000
 rainbow_logging_handler
 snakecase
+opentracing
+jaeger-client
+opentracing_instrumentation

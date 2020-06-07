@@ -12,6 +12,7 @@ from datetime import datetime
 
 from covid import working_directory, DATABASE_CONNECTION_STRING
 from covid.core.fields import reported_totals_map
+from covid.core.tracing import tracer, trace_command_line_arguments
 
 working_sub_directory = os.path.join(working_directory, 'timeseries')
 os.makedirs(working_sub_directory, exist_ok=True)
@@ -38,45 +39,52 @@ if __name__ == "__main__":
     url = files.get(args.source)
     target_file = os.path.join(args.working_directory, args.source + '.csv')
 
-    if (args.step == 'fetch'):
-        logger.info(f'Fetch {url} -> {target_file}')
+    with tracer.start_span('covid.timeseries') as span:
+        trace_command_line_arguments(span, args)
+        span.set_tag('url', url)
+        span.set_tag('target_file', target_file)
 
-        result = requests.get(url)
-        with open(target_file, 'wb') as file:
-            file.write(result.content)
+        if (args.step == 'fetch'):
+            logger.info(f'Fetch {url} -> {target_file}')
 
-    elif args.step == 'load':
-        logger.info(f'Loading {target_file}')
+            result = requests.get(url)
+            with open(target_file, 'wb') as file:
+                file.write(result.content)
 
-        frame: pd.DataFrame = pd.read_csv(target_file)
+        elif args.step == 'load':
+            logger.info(f'Loading {target_file}')
 
-        logger.info('Formatting Columns')
-        frame.drop(columns=['Lat', 'Long'], inplace=True)
-        frame.rename(columns={'Province/State': 'province_state', 'Country/Region': 'country_region'}, inplace=True)
+            frame: pd.DataFrame = pd.read_csv(target_file)
 
-        if frame.empty:
-            logger.exception('', ValueError('frame was empty'))
+            logger.info('Formatting Columns')
+            frame.drop(columns=['Lat', 'Long'], inplace=True)
+            frame.rename(columns={'Province/State': 'province_state', 'Country/Region': 'country_region'}, inplace=True)
 
-        logger.info('Unpivoting Date Columns')
-        pivoted = frame.melt(id_vars=['country_region', 'province_state'], var_name='date', value_name='value')
-        pivoted['date'] = pivoted['date'].astype('datetime64')
-        pivoted['field'] = reported_totals_map.get(args.source)
-        pivoted = pivoted[['country_region', 'province_state', 'field', 'date', 'value']]
-        pivoted['is_updated'] = True # should be used when switching to incremental loads
-        pivoted['updated_at'] = datetime.utcnow()
+            if frame.empty:
+                logger.exception('', ValueError('frame was empty'))
 
-        if args.console:
-            print(pivoted)
+            logger.info('Unpivoting Date Columns')
+            pivoted = frame.melt(id_vars=['country_region', 'province_state'], var_name='date', value_name='value')
+            pivoted['date'] = pivoted['date'].astype('datetime64')
+            pivoted['field'] = reported_totals_map.get(args.source)
+            pivoted = pivoted[['country_region', 'province_state', 'field', 'date', 'value']]
+            pivoted['is_updated'] = True # should be used when switching to incremental loads
+            pivoted['updated_at'] = datetime.utcnow()
 
-        if args.publish:
-            logger.info(f'Writing {pivoted.shape[0]} rows to datastore')
+            if args.console:
+                print(pivoted)
 
-            engine = create_engine(args.target_database)
+            if args.publish:
+                logger.info(f'Writing {pivoted.shape[0]} rows to datastore')
 
-            with engine.begin() as connection:
-                connection.execute("DELETE FROM public.timeseries WHERE field = '" + field + "'")
-                pivoted.to_sql('timeseries', con=connection, if_exists='append', index=False)
+                engine = create_engine(args.target_database)
 
-    elif args.step == 'clean':
-        logger.info(f'Cleaning {working_sub_directory}')
-        shutil.rmtree(working_sub_directory)
+                with engine.begin() as connection:
+                    connection.execute("DELETE FROM public.timeseries WHERE field = '" + field + "'")
+                    pivoted.to_sql('timeseries', con=connection, if_exists='append', index=False)
+
+        elif args.step == 'clean':
+            logger.info(f'Cleaning {working_sub_directory}')
+            shutil.rmtree(working_sub_directory)
+
+    tracer.close()

@@ -10,9 +10,9 @@ import snakecase
 from datetime import datetime
 
 
-from covid import working_directory, DATABASE_CONNECTION_STRING
-working_sub_directory = os.path.join(working_directory, 'countries')
+from covid import working_directory, DATABASE_CONNECTION_STRING\
 
+working_sub_directory = os.path.join(working_directory, 'countries')
 os.makedirs(working_sub_directory, exist_ok=True)
 
 logger = logging.getLogger(__package__)
@@ -66,8 +66,8 @@ if __name__ == "__main__":
             engine = create_engine(args.target_database)
 
             with engine.begin() as connection:
-                connection.execute('DROP TABLE public.countries')
-                frame.to_sql('countries', con=connection, if_exists='fail', index=False)
+                connection.execute('TRUNCATE TABLE public.countries')
+                frame.to_sql('countries', con=connection, if_exists='append', index=False)
 
     elif args.step == 'clean':
         logger.info(f'Cleaning {working_sub_directory}')

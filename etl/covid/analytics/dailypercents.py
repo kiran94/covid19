@@ -1,7 +1,7 @@
 import argparse
 import logging
 from covid import DATABASE_CONNECTION_STRING
-from covid.core.fields import reported_totals_map, reported_daily_map
+from covid.core.fields import reported_totals_map, daily_precent
 import pandas as pd
 import sqlalchemy
 from typing import List
@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 group_fields = ['country_region', 'province_state']
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', choices=reported_totals_map.keys(), required=True)
     parser.add_argument('--publish', action='store_true', help='Actually Publish the results to the datastore?')
@@ -21,23 +20,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     field = reported_totals_map.get(args.source)
-    target_field = reported_daily_map.get(args.source)
+    target_field = daily_precent.get(args.source)
 
     with tracer.start_span('covid.analytics.dailytotals') as span:
         trace_command_line_arguments(span, args)
         span.set_tag('source_field', field)
         span.set_tag('target_field', target_field)
 
-        logger.info(f'Computing Daily Totals for {field} -> {target_field}')
+        logger.info(f'Computing Daily Percents for {field} -> {target_field}')
 
         engine = sqlalchemy.create_engine(DATABASE_CONNECTION_STRING)
-
-        frame: pd.DataFrame = pd.read_sql(f'''
-            select *
-            from public.timeseries
-            where field = \'{field}\'
-        ''', con=engine)
-
+        frame: pd.DataFrame = pd.read_sql(f'select * from public.timeseries where field = \'{field}\'', con=engine)
 
         logger.info(f'Loaded {frame.shape[0]} rows')
 
@@ -48,8 +41,20 @@ if __name__ == "__main__":
 
         for index, grouped in grouped:
             logger.debug('Computing ' + str(index))
-            grouped['value'] = grouped['value'] - grouped['value'].shift(+1)
+
+            grouped.sort_values(by='date', inplace=True)
+
+            # grouped['original_value'] = grouped['value']
+
+            previous = grouped['value'].shift(-1)
+            current = grouped['value']
+
+            grouped['value'] = (previous - current) / previous * 100
+
             grouped.loc[grouped['province_state'] == '', 'province_state'] = None
+
+            # print(grouped)
+            # exit(0)
 
             computed.append(grouped)
 

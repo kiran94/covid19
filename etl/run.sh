@@ -43,3 +43,8 @@ python -m covid.analytics.rollingaverages -s recovered -f TWENTYONEDAY --publish
 python -m covid.analytics.populationratios --source deaths --publish
 python -m covid.analytics.populationratios --source confirmed --publish
 python -m covid.analytics.populationratios --source recovered --publish
+
+# Daily Percent Changes
+python -m covid.analytics.dailypercents --source deaths --publish
+python -m covid.analytics.dailypercents --source confirmed --publish
+python -m covid.analytics.dailypercents --source recovered --publish

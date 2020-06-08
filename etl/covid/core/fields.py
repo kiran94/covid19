@@ -35,3 +35,9 @@ population_ratio: Dict[str, str] = {
     'confirmed': 'POPULATION_CONFIRMED_RATIO',
     'recovered': 'POPULATION_RECOVERED_RATIO',
 }
+
+daily_precent: Dict[str, str] = {
+    'deaths': 'DAILY_PERCENT_INCREASE_DEATHS',
+    'confirmed': 'DAILY_PERCENT_INCREASE_CONFIRMED',
+    'recovered': 'DAILY_PERCENT_INCREASE_RECOVERED',
+}

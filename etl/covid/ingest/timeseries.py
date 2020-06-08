@@ -70,8 +70,9 @@ if __name__ == "__main__":
             pivoted['date'] = pivoted['date'].astype('datetime64')
             pivoted['value'] = pivoted['value'].astype('float64')
             pivoted = pivoted[['country_region', 'province_state', 'field', 'date', 'value']]
-            pivoted['is_updated'] = True # should be used when switching to incremental loads
-            pivoted['updated_at'] = datetime.utcnow()
+
+            # pivoted['is_updated'] = True # should be used when switching to incremental loads
+            # pivoted['updated_at'] = datetime.utcnow()
 
             if args.console:
                 print(pivoted)

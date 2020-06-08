@@ -17,7 +17,7 @@ from covid.core.tracing import tracer, trace_command_line_arguments
 working_sub_directory = os.path.join(working_directory, 'timeseries')
 os.makedirs(working_sub_directory, exist_ok=True)
 
-logger = logging.getLogger(__package__)
+logger = logging.getLogger(__name__)
 
 files = {
     'deaths': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
@@ -65,8 +65,10 @@ if __name__ == "__main__":
 
             logger.info('Unpivoting Date Columns')
             pivoted = frame.melt(id_vars=['country_region', 'province_state'], var_name='date', value_name='value')
-            pivoted['date'] = pivoted['date'].astype('datetime64')
+
             pivoted['field'] = reported_totals_map.get(args.source)
+            pivoted['date'] = pivoted['date'].astype('datetime64')
+            pivoted['value'] = pivoted['value'].astype('float64')
             pivoted = pivoted[['country_region', 'province_state', 'field', 'date', 'value']]
             pivoted['is_updated'] = True # should be used when switching to incremental loads
             pivoted['updated_at'] = datetime.utcnow()

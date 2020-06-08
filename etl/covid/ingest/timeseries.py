@@ -6,8 +6,7 @@ import os
 import requests
 import shutil
 from sqlalchemy import create_engine
-import snakecase
-from datetime import datetime
+# from datetime import datetime
 
 
 from covid import working_directory, DATABASE_CONNECTION_STRING
@@ -20,9 +19,9 @@ os.makedirs(working_sub_directory, exist_ok=True)
 logger = logging.getLogger(__name__)
 
 files = {
-    'deaths': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
-    'confirmed': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
-    'recovered': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
+    'deaths': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv', # noqa
+    'confirmed': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv', # noqa
+    'recovered': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv' # noqa
 }
 
 if __name__ == "__main__":
@@ -83,7 +82,7 @@ if __name__ == "__main__":
                 engine = create_engine(args.target_database)
 
                 with engine.begin() as connection:
-                    connection.execute("DELETE FROM public.timeseries WHERE field = '" + field + "'")
+                    connection.execute("DELETE FROM public.timeseries WHERE field = '" + reported_totals_map.get(args.source) + "'")
                     pivoted.to_sql('timeseries', con=connection, if_exists='append', index=False)
 
         elif args.step == 'clean':

@@ -27,6 +27,7 @@ config = Config(
 
 tracer = config.initialize_tracer()
 
+
 def trace_command_line_arguments(span, args: Namespace):
     for key, value in vars(args).items():
         span.set_tag(key, value)

@@ -38,7 +38,6 @@ if __name__ == "__main__":
             where field = \'{field}\'
         ''', con=engine)
 
-
         logger.info(f'Loaded {frame.shape[0]} rows')
 
         frame.fillna('', inplace=True)

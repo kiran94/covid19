@@ -1,10 +1,9 @@
 import argparse
 import logging
 from covid import DATABASE_CONNECTION_STRING
-from covid.core.fields import reported_totals_map, reported_daily_map, population_ratio
+from covid.core.fields import reported_totals_map, population_ratio
 import pandas as pd
 import sqlalchemy
-from typing import List
 from covid.core.tracing import tracer, trace_command_line_arguments
 
 logger = logging.getLogger(__name__)

@@ -23,8 +23,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', '--step', choices=['fetch', 'load', 'clean'], required=True)
     parser.add_argument('-u', '--url',
-        type=str, default='https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv',
-        help='URL of the data source (in CSV format)')
+                        type=str,
+                        default='https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv',
+                        help='URL of the data source (in CSV format)')
     parser.add_argument('--publish', action='store_true', help='Actually Publish the results to the datastore?')
     parser.add_argument('--console', action='store_true', help='Print the processed frame to console')
     parser.add_argument('--working_directory', default=working_sub_directory)
@@ -52,10 +53,9 @@ if __name__ == "__main__":
                 target_file,
                 usecols=['Country_Region', 'Province_State', 'Lat', 'Long_', 'iso2', 'iso3', 'Population'])
 
-
             frame.rename(columns={'Long_': 'Long', 'Country_Region': 'CountryRegion', 'Province_State': 'ProvinceState'}, inplace=True)
             frame.columns = list(map(snakecase.convert, frame.columns))
-            frame['is_updated'] = True # should be used when switching to incremental loads
+            frame['is_updated'] = True  # should be used when switching to incremental loads
             frame['updated_at'] = datetime.utcnow()
 
             if frame.empty:

@@ -2,6 +2,7 @@ import logging
 from rainbow_logging_handler import RainbowLoggingHandler
 import sys
 
+
 class CovidLogger(logging.Logger):
 
     def __init__(self,
@@ -20,7 +21,6 @@ class CovidLogger(logging.Logger):
         handler = RainbowLoggingHandler(sys.stderr, color_funcName=('black', 'yellow', True))
         handler.setFormatter(formatter)
         self.addHandler(handler)
-
 
 
 logging.setLoggerClass(CovidLogger)

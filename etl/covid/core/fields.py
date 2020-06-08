@@ -29,3 +29,9 @@ rolling_averages: Dict[str, Dict[str, str]] = {
         'recovered': 'ROLLING_AVERAGE_TWENTYONEDAY_RECOVERED'
     }
 }
+
+population_ratio: Dict[str, str] = {
+    'deaths': 'POPULATION_DEATH_RATIO',
+    'confirmed': 'POPULATION_CONFIRMED_RATIO',
+    'recovered': 'POPULATION_RECOVERED_RATIO',
+}

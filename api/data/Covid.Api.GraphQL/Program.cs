@@ -15,6 +15,7 @@ namespace Covid.Api.GraphQL
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.ConfigureKestrel(options => options.AllowSynchronousIO = true);
                 });
     }
 }

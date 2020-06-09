@@ -7,6 +7,11 @@ namespace Covid.Api.GraphQL
     using Microsoft.Extensions.Hosting;
     using Microsoft.EntityFrameworkCore;
     using Covid.Api.Common.DataAccess;
+    using global::GraphQL;
+    using Covid.Api.GraphQL.Schema;
+    using global::GraphQL.Server;
+    using global::GraphQL.Server.Ui.Playground;
+    using Covid.Api.GraphQL.Query;
 
     public class Startup
     {
@@ -17,7 +22,6 @@ namespace Covid.Api.GraphQL
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContextPool<ApiContext>(builder =>
@@ -36,10 +40,17 @@ namespace Covid.Api.GraphQL
                 builder.UseSnakeCaseNamingConvention();
             });
 
+            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
+            services.AddScoped<AppSchema>();
+            services.AddScoped<AppQuery>();
+            services.AddGraphQL(options =>
+            {
+                options.ExposeExceptions = true;
+            }).AddGraphTypes();
+
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -51,7 +62,8 @@ namespace Covid.Api.GraphQL
 
             app.UseRouting();
 
-            // app.UseAuthorization();
+            app.UseGraphQL<AppSchema>();
+            app.UseGraphQLPlayground(options: new GraphQLPlaygroundOptions());
 
             app.UseEndpoints(endpoints =>
             {

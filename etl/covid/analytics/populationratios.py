@@ -5,6 +5,7 @@ from covid.core.fields import reported_totals_map, population_ratio
 import pandas as pd
 import sqlalchemy
 from covid.core.tracing import tracer, trace_command_line_arguments
+from covid.core import COUNTRY_INDEX
 
 logger = logging.getLogger(__name__)
 
@@ -33,11 +34,10 @@ if __name__ == "__main__":
         timeseries = pd.read_sql(f'select * from public.timeseries where field = \'{source_field}\'', con=engine)
         countries = pd.read_sql('select * from public.countries', con=engine)
 
-        countries = countries[['country_region', 'province_state', 'population']]
-        index = ['country_region', 'province_state']
+        countries = countries[['country_region', 'province_state', 'county', 'population']]
 
         logger.info('Stitching Population to Timeseries')
-        timeseries = timeseries.merge(countries, how='inner', on=index)
+        timeseries = timeseries.merge(countries, how='inner', on=COUNTRY_INDEX)
 
         logger.info(f'Computing {args.source} / Population Ratio')
 

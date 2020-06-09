@@ -58,6 +58,7 @@ if __name__ == "__main__":
             logger.info('Formatting Columns')
             frame.drop(columns=['Lat', 'Long'], inplace=True)
             frame.rename(columns={'Province/State': 'province_state', 'Country/Region': 'country_region'}, inplace=True)
+            frame['province_state'].fillna(value='', inplace=True)
 
             if frame.empty:
                 logger.exception('', ValueError('frame was empty'))
@@ -68,7 +69,8 @@ if __name__ == "__main__":
             pivoted['field'] = reported_totals_map.get(args.source)
             pivoted['date'] = pivoted['date'].astype('datetime64')
             pivoted['value'] = pivoted['value'].astype('float64')
-            pivoted = pivoted[['country_region', 'province_state', 'field', 'date', 'value']]
+            pivoted['county'] = ''
+            pivoted = pivoted[['country_region', 'province_state', 'county', 'field', 'date', 'value']]
 
             # pivoted['is_updated'] = True # should be used when switching to incremental loads
             # pivoted['updated_at'] = datetime.utcnow()

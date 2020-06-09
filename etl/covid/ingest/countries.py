@@ -49,13 +49,17 @@ if __name__ == "__main__":
 
             frame: pd.DataFrame = pd.read_csv(
                 target_file,
-                usecols=['Country_Region', 'Province_State', 'Lat', 'Long_', 'iso2', 'iso3', 'Population'])
+                usecols=['Country_Region', 'Province_State', 'Admin2', 'Lat', 'Long_', 'iso2', 'iso3', 'Population'])
 
             frame.rename(columns={
                 'Lat': 'Latitude',
                 'Long_': 'Longitude',
+                'Admin2': 'County',
                 'Country_Region': 'CountryRegion',
                 'Province_State': 'ProvinceState'}, inplace=True)
+
+            frame['ProvinceState'].fillna(value='', inplace=True)
+            frame['County'].fillna(value='', inplace=True)
             frame.columns = list(map(snakecase.convert, frame.columns))
 
             if frame.empty:
@@ -71,8 +75,8 @@ if __name__ == "__main__":
                 engine = create_engine(args.target_database)
 
                 with engine.begin() as connection:
-                    connection.execute('TRUNCATE TABLE public.countries')
-                    frame.to_sql('countries', con=connection, if_exists='append', index=False)
+                    connection.execute('TRUNCATE TABLE public.country')
+                    frame.to_sql('country', con=connection, if_exists='append', index=False)
 
         elif args.step == 'clean':
             logger.info(f'Cleaning {working_sub_directory}')

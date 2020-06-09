@@ -51,7 +51,11 @@ if __name__ == "__main__":
                 target_file,
                 usecols=['Country_Region', 'Province_State', 'Lat', 'Long_', 'iso2', 'iso3', 'Population'])
 
-            frame.rename(columns={'Lat': 'Latitude', 'Long_': 'Longitude', 'Country_Region': 'CountryRegion', 'Province_State': 'ProvinceState'}, inplace=True)
+            frame.rename(columns={
+                'Lat': 'Latitude',
+                'Long_': 'Longitude',
+                'Country_Region': 'CountryRegion',
+                'Province_State': 'ProvinceState'}, inplace=True)
             frame.columns = list(map(snakecase.convert, frame.columns))
 
             if frame.empty:

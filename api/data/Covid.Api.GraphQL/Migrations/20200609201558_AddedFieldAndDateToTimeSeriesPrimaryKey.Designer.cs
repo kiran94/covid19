@@ -3,15 +3,17 @@ using System;
 using Covid.Api.Common.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Covid.Api.GraphQL.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    partial class ApiContextModelSnapshot : ModelSnapshot
+    [Migration("20200609201558_AddedFieldAndDateToTimeSeriesPrimaryKey")]
+    partial class AddedFieldAndDateToTimeSeriesPrimaryKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,7 +90,7 @@ namespace Covid.Api.GraphQL.Migrations
                         .HasColumnType("varchar")
                         .HasMaxLength(128);
 
-                    b.Property<double?>("Value")
+                    b.Property<double>("Value")
                         .HasColumnName("value")
                         .HasColumnType("double precision");
 

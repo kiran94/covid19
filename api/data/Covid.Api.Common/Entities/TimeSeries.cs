@@ -1,15 +1,15 @@
 namespace Covid.Api.Common.Entities
 {
-    public class Country
+    using System;
+
+    public class TimeSeries
     {
         public string CountryRegion { get; set; }
         public string ProvinceState { get; set; }
         public string County { get; set; }
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
-        public double? Population { get; set; }
-        public string Iso2 { get; set; }
-        public string Iso3 { get; set; }
+        public string Field { get; set; }
+        public DateTime Date { get; set; }
+        public double? Value { get; set; }
 
         /// <inheritdoc />
         public override string ToString() => $"{this.CountryRegion} - {this.ProvinceState} - {this.County}";

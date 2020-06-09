@@ -28,6 +28,20 @@ namespace Covid.Api.Common.DataAccess
                 options.Property(p => p.Iso3).HasColumnType("char(3)");
             });
 
+            modelBuilder.Entity<TimeSeries>(options =>
+            {
+                options.ToTable("timeseries", "public");
+                options.HasKey(x => new { x.CountryRegion, x.ProvinceState, x.County, x.Date, x.Field });
+
+                options.Property(p => p.CountryRegion).HasColumnType("varchar").HasMaxLength(64);
+                options.Property(p => p.ProvinceState).HasColumnType("varchar").HasMaxLength(64);
+                options.Property(p => p.County).HasColumnType("varchar").HasMaxLength(64);
+
+                options.Property(p => p.Field).HasColumnType("varchar").HasMaxLength(128);
+                options.Property(p => p.Value).HasColumnType("double precision");
+                options.Property(p => p.Date);
+            });
+
             base.OnModelCreating(modelBuilder);
         }
     }

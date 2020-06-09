@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
         logger.info('Getting Timeseries and Country Information')
         timeseries = pd.read_sql(f'select * from public.timeseries where field = \'{source_field}\'', con=engine)
-        countries = pd.read_sql('select * from public.countries', con=engine)
+        countries = pd.read_sql('select * from public.country', con=engine)
 
         countries = countries[['country_region', 'province_state', 'county', 'population']]
 

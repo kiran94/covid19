@@ -7,8 +7,6 @@ import requests
 import shutil
 from sqlalchemy import create_engine
 import snakecase
-from datetime import datetime
-
 
 from covid import working_directory, DATABASE_CONNECTION_STRING
 from covid.core.tracing import tracer, trace_command_line_arguments
@@ -53,10 +51,8 @@ if __name__ == "__main__":
                 target_file,
                 usecols=['Country_Region', 'Province_State', 'Lat', 'Long_', 'iso2', 'iso3', 'Population'])
 
-            frame.rename(columns={'Long_': 'Long', 'Country_Region': 'CountryRegion', 'Province_State': 'ProvinceState'}, inplace=True)
+            frame.rename(columns={'Lat': 'Latitude', 'Long_': 'Longitude', 'Country_Region': 'CountryRegion', 'Province_State': 'ProvinceState'}, inplace=True)
             frame.columns = list(map(snakecase.convert, frame.columns))
-            frame['is_updated'] = True  # should be used when switching to incremental loads
-            frame['updated_at'] = datetime.utcnow()
 
             if frame.empty:
                 logger.exception('', ValueError('frame was empty'))

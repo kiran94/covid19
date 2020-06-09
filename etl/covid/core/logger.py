@@ -22,7 +22,4 @@ class CovidLogger(logging.Logger):
         handler.setFormatter(formatter)
         self.addHandler(handler)
 
-
-logging.setLoggerClass(CovidLogger)
-
 logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)

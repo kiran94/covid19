@@ -1,5 +1,10 @@
 import os
 
+import logging
+from covid.core.logger import CovidLogger
+
+logging.setLoggerClass(CovidLogger)
+
 working_directory = 'data'
 
 os.makedirs(working_directory, exist_ok=True)

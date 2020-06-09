@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Covid.Api.Common.DataAccess;
 
 namespace Covid.Api.GraphQL
 {
@@ -25,6 +27,22 @@ namespace Covid.Api.GraphQL
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContextPool<ApiContext>(builder =>
+            {
+                var host = System.Environment.GetEnvironmentVariable("POSTGRES_HOST");
+                var port = System.Environment.GetEnvironmentVariable("POSTGRES_PORT");
+                var user = System.Environment.GetEnvironmentVariable("POSTGRES_USER");
+                var password = System.Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+                var database = System.Environment.GetEnvironmentVariable("COVID_DATABASE_NAME");
+
+                builder.UseNpgsql($"Host={host};Database={database};Username={user};Password={password}", options =>
+                {
+                    options.MigrationsAssembly("Covid.Api.GraphQL");
+                });
+
+                builder.UseSnakeCaseNamingConvention();
+            });
+
             services.AddControllers();
         }
 

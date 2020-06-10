@@ -2,6 +2,7 @@ namespace Covid.Api.GraphQL
 {
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
 
     public class Program
     {
@@ -16,6 +17,10 @@ namespace Covid.Api.GraphQL
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.ConfigureKestrel(options => options.AllowSynchronousIO = true);
+                }).ConfigureLogging((context, logging) =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
                 });
     }
 }

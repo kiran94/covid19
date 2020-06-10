@@ -19,13 +19,18 @@ namespace Covid.Api.GraphQL.Query
                 description: "Get Country Information",
                 arguments: new QueryArguments()
                 {
-                    new QueryArgument<StringGraphType>() { Name = "query" }
+                    new QueryArgument<StringGraphType>() { Name = "query", Description = " Search Country/Region/Province/State/County" },
+                    new QueryArgument<IntGraphType>() { Name = "take", Description = "(Pagination) only take specified number of results" },
+                    new QueryArgument<IntGraphType>() { Name = "skip", Description = "(Pagination) skip the specified number of results" }
                 },
                 resolve: async context =>
                 {
                     logger.LogInformation("Getting Country Information");
 
-                    var countries = sql.Set<Country>().AsQueryable();
+                    var countries = sql.Set<Country>()
+                        .OrderBy(x => x.CountryRegion)
+                        .ThenBy(x => x.ProvinceState)
+                        .AsQueryable();
 
                     if (context.TryGetArgument<string>("query", out var query))
                     {
@@ -36,7 +41,12 @@ namespace Covid.Api.GraphQL.Query
                                 || EF.Functions.Like(x.County, query));
                     }
 
-                    return await countries.ToListAsync(context.CancellationToken);
+                    if (context.TryGetArgument<int>("take", out var take)) countries = countries.Take(take);
+                    if (context.TryGetArgument<int>("skip", out var skip)) countries = countries.Skip(skip);
+
+                    return await countries
+                        .OrderBy(x => x.CountryRegion)
+                        .ToListAsync(context.CancellationToken);
                 });
         }
     }

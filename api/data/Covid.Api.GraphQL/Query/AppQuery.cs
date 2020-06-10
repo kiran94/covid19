@@ -10,6 +10,7 @@ namespace Covid.Api.GraphQL.Query
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
 
     public class AppQuery : ObjectGraphType
     {
@@ -38,9 +39,9 @@ namespace Covid.Api.GraphQL.Query
                     {
                         query = "%" + query + "%";
                         countries = countries.Where(
-                            x => EF.Functions.Like(x.CountryRegion, query)
-                                || EF.Functions.Like(x.ProvinceState, query)
-                                || EF.Functions.Like(x.County, query));
+                            x => EF.Functions.ILike(x.CountryRegion, query)
+                                || EF.Functions.ILike(x.ProvinceState, query)
+                                || EF.Functions.ILike(x.County, query));
                     }
 
                     if (context.TryGetArgument<int>("take", out var take)) countries = countries.Take(take);
@@ -57,47 +58,48 @@ namespace Covid.Api.GraphQL.Query
                 name: "timeseries",
                 description: "Gets the COVID-19 Timeseries Data",
                 arguments: new QueryArguments() {
-                    new QueryArgument<StringGraphType>() { Name = "country_region", Description = "The Country/Region to Filter on" },
-                    new QueryArgument<StringGraphType>() { Name = "province_state", Description = "The Province/State to Filter on", DefaultValue = "" },
-                    new QueryArgument<StringGraphType>() { Name = "county", Description = "The County to Filter on", DefaultValue = "" },
-                    new QueryArgument<StringGraphType>() { Name = "field", Description = "The Field to Filter on" },
-                    new QueryArgument<DateTimeGraphType>() { Name = "date", Description = "The Time to Filter on" },
+                    new QueryArgument<ListGraphType<StringGraphType>>() { Name = "country_region", Description = "The Country/Region(s) to Filter on"},
+                    new QueryArgument<ListGraphType<StringGraphType>>() { Name = "province_state", Description = "The Province/State(s) to Filter on"},
+                    new QueryArgument<ListGraphType<StringGraphType>>() { Name = "counties", Description = "The Counties to Filter on" },
+                    new QueryArgument<ListGraphType<StringGraphType>>() { Name = "fields", Description = "The Field to Filter on" },
+                    new QueryArgument<ListGraphType<DateTimeGraphType>>() { Name = "dates", Description = "The Time to Filter on" },
                     new QueryArgument<IntGraphType>() { Name = "take", Description = "(Pagination) only take specified number of results" },
                     new QueryArgument<IntGraphType>() { Name = "skip", Description = "(Pagination) skip the specified number of results" }
                 },
                 resolve: async context =>
                 {
                     logger.LogInformation("Getting TimeSeries Information");
+                    using var _ = logger.BeginScope(context.Arguments);
 
                     var timeseries = sql.Set<TimeSeries>().OrderByDescending(x => x.Date).AsQueryable();
 
-                    if (context.TryGetArgument<string>("country_region", out var country))
+                    if (context.TryGetArgument<List<string>>("country_region", out var countries))
                     {
-                        timeseries = timeseries.Where(x => x.CountryRegion == country);
+                        timeseries = timeseries.Where(x => countries.Contains(x.CountryRegion));
                     }
 
-                    if (context.TryGetArgument<string>("province_state", out var province))
+                    if (context.TryGetArgument<List<string>>("province_state", out var provinces))
                     {
-                        timeseries = timeseries.Where(x => x.ProvinceState == province);
+                        timeseries = timeseries.Where(x => provinces.Contains(x.ProvinceState));
                     }
 
-                    if (context.TryGetArgument<string>("county", out var county))
+                    if (context.TryGetArgument<List<string>>("counties", out var counties))
                     {
-                        timeseries = timeseries.Where(x => x.County == county);
+                        timeseries = timeseries.Where(x => counties.Contains(x.County));
                     }
 
-                    if (context.TryGetArgument<string>("field", out var field))
+                    if (context.TryGetArgument<List<string>>("fields", out var fields))
                     {
-                        timeseries = timeseries.Where(x => x.Field == field);
+                        timeseries = timeseries.Where(x => fields.Contains(x.Field));
                     }
 
-                    if (context.TryGetArgument<DateTime>("date", out var date))
+                    if (context.TryGetArgument<List<DateTime>>("dates", out var dates))
                     {
-                        timeseries = timeseries.Where(x => x.Date == date);
+                        timeseries = timeseries.Where(x => dates.Contains(x.Date));
                     }
 
-                    if (context.TryGetArgument<int>("take", out var take)) timeseries = timeseries.Take(take);
                     if (context.TryGetArgument<int>("skip", out var skip)) timeseries = timeseries.Skip(skip);
+                    if (context.TryGetArgument<int>("take", out var take)) timeseries = timeseries.Take(take);
 
                     return await timeseries.ToListAsync(context.CancellationToken);
                 });

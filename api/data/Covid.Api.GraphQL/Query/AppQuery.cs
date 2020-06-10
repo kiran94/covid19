@@ -1,3 +1,4 @@
+using System.Threading;
 using System;
 namespace Covid.Api.GraphQL.Query
 {
@@ -11,10 +12,11 @@ namespace Covid.Api.GraphQL.Query
     using Microsoft.Extensions.Logging;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using OpenTracing;
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(ApiContext sql, ILogger<AppQuery> logger)
+        public AppQuery(ApiContext sql, ILogger<AppQuery> logger, ITracer tracer)
         {
             #region countries
             this.FieldAsync<ListGraphType<CountryType>>(
@@ -28,6 +30,8 @@ namespace Covid.Api.GraphQL.Query
                 },
                 resolve: async context =>
                 {
+                    tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
+
                     logger.LogInformation("Getting Country Information");
 
                     var countries = sql.Set<Country>()
@@ -68,6 +72,8 @@ namespace Covid.Api.GraphQL.Query
                 },
                 resolve: async context =>
                 {
+                    tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
+
                     logger.LogInformation("Getting TimeSeries Information");
                     using var _ = logger.BeginScope(context.Arguments);
 

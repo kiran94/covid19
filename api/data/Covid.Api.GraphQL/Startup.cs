@@ -12,6 +12,10 @@ namespace Covid.Api.GraphQL
     using global::GraphQL.Server;
     using global::GraphQL.Server.Ui.Playground;
     using Covid.Api.GraphQL.Query;
+    using OpenTracing;
+    using System.Reflection;
+    using Microsoft.Extensions.Logging;
+    using OpenTracing.Util;
 
     public class Startup
     {
@@ -26,6 +30,7 @@ namespace Covid.Api.GraphQL
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // EF CORE
             services.AddDbContextPool<ApiContext>(builder =>
             {
                 var host = System.Environment.GetEnvironmentVariable("POSTGRES_HOST");
@@ -44,6 +49,7 @@ namespace Covid.Api.GraphQL
                 builder.EnableSensitiveDataLogging(Environment.IsDevelopment());
             });
 
+            // GRAPHQL
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
             services.AddScoped<AppSchema>();
             services.AddScoped<AppQuery>();
@@ -52,6 +58,23 @@ namespace Covid.Api.GraphQL
                 options.ExposeExceptions = true;
             }).AddGraphTypes();
 
+            // OPENTRACING
+            services.AddSingleton<ITracer>(provider =>
+            {
+                var serviceName = Assembly.GetEntryAssembly().GetName().Name;
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+
+                var config = Jaeger.Configuration.FromIConfiguration(
+                    loggerFactory,
+                    this.Configuration.GetSection("Jaeger"));
+
+                var tracer = config.GetTracer();
+                GlobalTracer.Register(tracer);
+
+                return tracer;
+            });
+
+            services.AddOpenTracing();
             services.AddControllers();
         }
 

@@ -6,10 +6,9 @@ import pandas as pd
 import sqlalchemy
 from typing import List
 from covid.core.tracing import tracer, trace_command_line_arguments
+from covid.core import COUNTRY_INDEX
 
 logger = logging.getLogger(__name__)
-
-group_fields = ['country_region', 'province_state']
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -34,8 +33,7 @@ if __name__ == "__main__":
 
         logger.info(f'Loaded {frame.shape[0]} rows')
 
-        frame.fillna('', inplace=True)
-        grouped = frame.groupby(by=group_fields)
+        grouped = frame.groupby(by=COUNTRY_INDEX)
 
         computed: List[pd.DataFrame] = []
 
@@ -50,11 +48,6 @@ if __name__ == "__main__":
             current = grouped['value']
 
             grouped['value'] = (previous - current) / previous * 100
-
-            grouped.loc[grouped['province_state'] == '', 'province_state'] = None
-
-            # print(grouped)
-            # exit(0)
 
             computed.append(grouped)
 

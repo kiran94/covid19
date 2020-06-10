@@ -15,12 +15,14 @@ namespace Covid.Api.GraphQL
 
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            this.Configuration = configuration;
+            this.Environment = environment;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -38,6 +40,8 @@ namespace Covid.Api.GraphQL
                 });
 
                 builder.UseSnakeCaseNamingConvention();
+                builder.EnableDetailedErrors(Environment.IsDevelopment());
+                builder.EnableSensitiveDataLogging(Environment.IsDevelopment());
             });
 
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));

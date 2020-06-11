@@ -8,7 +8,7 @@ from typing import List
 from covid.core.tracing import tracer, trace_command_line_arguments
 from covid.core import COUNTRY_INDEX
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('covid.analytics.rollingaverages')
 
 rolling_map = {
     'SEVENDAY': 7,
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     field = reported_daily_map.get(args.source)
     target_field = rolling_averages[args.frequency][args.source]
 
-    with tracer.start_span('covid.analytics.rollingaverages') as span:
+    with tracer.start_span(logger.name) as span:
         trace_command_line_arguments(span, args)
         span.set_tag('source_field', field)
         span.set_tag('target_field', target_field)

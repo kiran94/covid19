@@ -7,7 +7,7 @@ import sqlalchemy
 from covid.core.tracing import tracer, trace_command_line_arguments
 from covid.core import COUNTRY_INDEX
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('covid.analytics.populationratios')
 
 if __name__ == "__main__":
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     source_field = reported_totals_map[args.source]
     target_field = population_ratio[args.source]
 
-    with tracer.start_span('covid.analytics.populationratios') as span:
+    with tracer.start_span(logger.name) as span:
         trace_command_line_arguments(span, args)
 
         span.set_tag('source_field', source_field)

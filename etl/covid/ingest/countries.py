@@ -14,7 +14,9 @@ from covid.core.tracing import tracer, trace_command_line_arguments
 working_sub_directory = os.path.join(working_directory, 'countries')
 os.makedirs(working_sub_directory, exist_ok=True)
 
-logger = logging.getLogger(__package__)
+
+logger = logging.getLogger('covid.ingest.countries')
+
 
 if __name__ == "__main__":
 
@@ -32,7 +34,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    with tracer.start_span('covid.countries') as span:
+    with tracer.start_span(logger.name) as span:
         trace_command_line_arguments(span, args)
 
         target_file = os.path.join(args.working_directory, args.working_file)

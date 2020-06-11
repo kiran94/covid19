@@ -16,7 +16,7 @@ from covid.core.tracing import tracer, trace_command_line_arguments
 working_sub_directory = os.path.join(working_directory, 'timeseries')
 os.makedirs(working_sub_directory, exist_ok=True)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('covid.ingest.timeseries')
 
 files = {
     'deaths': 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv', # noqa
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     url = files.get(args.source)
     target_file = os.path.join(args.working_directory, args.source + '.csv')
 
-    with tracer.start_span('covid.timeseries') as span:
+    with tracer.start_span(logger.name) as span:
         trace_command_line_arguments(span, args)
         span.set_tag('url', url)
         span.set_tag('target_file', target_file)

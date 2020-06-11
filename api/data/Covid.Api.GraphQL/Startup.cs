@@ -16,6 +16,7 @@ namespace Covid.Api.GraphQL
     using System.Reflection;
     using Microsoft.Extensions.Logging;
     using OpenTracing.Util;
+    using Serilog;
 
     public class Startup
     {
@@ -86,6 +87,7 @@ namespace Covid.Api.GraphQL
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSerilogRequestLogging();
             app.UseHttpsRedirection();
 
             app.UseRouting();

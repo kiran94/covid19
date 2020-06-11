@@ -2,7 +2,7 @@ namespace Covid.Api.GraphQL
 {
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
+    using Serilog;
 
     public class Program
     {
@@ -16,11 +16,12 @@ namespace Covid.Api.GraphQL
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.ConfigureKestrel(options => options.AllowSynchronousIO = true);
-                }).ConfigureLogging((context, logging) =>
-                {
-                    logging.ClearProviders();
-                    logging.AddConsole();
-                });
+                    webBuilder.ConfigureKestrel(kestrel => kestrel.AllowSynchronousIO = true);
+                })
+                .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
+                    .ReadFrom.Configuration(hostingContext.Configuration)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console()
+                );
     }
 }

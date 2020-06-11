@@ -47,6 +47,7 @@ namespace Covid.Api.GraphQL
                 builder.UseSnakeCaseNamingConvention();
                 builder.EnableDetailedErrors(Environment.IsDevelopment());
                 builder.EnableSensitiveDataLogging(Environment.IsDevelopment());
+                builder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
             // GRAPHQL

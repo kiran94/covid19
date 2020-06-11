@@ -12,7 +12,7 @@ logging.getLogger('jaeger_tracing').setLevel(TRACING_LOGGING_LEVEL)
 
 install_all_patches()
 
-TRACING_SERVICE_NAME = "COVID-19 ETL"
+TRACING_SERVICE_NAME = "Covid.Etl"
 
 config = Config(
     config={

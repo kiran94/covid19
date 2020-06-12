@@ -13,10 +13,13 @@ namespace Covid.Api.GraphQL
     using global::GraphQL.Server.Ui.Playground;
     using Covid.Api.GraphQL.Query;
     using OpenTracing;
+    using System;
     using System.Reflection;
     using Microsoft.Extensions.Logging;
     using OpenTracing.Util;
     using Serilog;
+    using CorrelationId.DependencyInjection;
+    using CorrelationId;
 
     public class Startup
     {
@@ -31,6 +34,14 @@ namespace Covid.Api.GraphQL
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // CORRELATION ID
+            services.AddDefaultCorrelationId(options =>
+            {
+                options.AddToLoggingScope = true;
+                options.IncludeInResponse = true;
+                options.CorrelationIdGenerator = () => Guid.NewGuid().ToString();
+            });
+
             // EF CORE
             services.AddDbContextPool<ApiContext>(builder =>
             {
@@ -82,6 +93,7 @@ namespace Covid.Api.GraphQL
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCorrelationId();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

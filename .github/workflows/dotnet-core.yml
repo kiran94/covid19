@@ -8,7 +8,7 @@ on:
     
 defaults:
   run:
-    working-directory: api/data
+    working-directory: api
     
 jobs:
   build:

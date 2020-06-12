@@ -7,3 +7,4 @@ snakecase
 opentracing
 jaeger-client
 opentracing_instrumentation
+tornado==5

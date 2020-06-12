@@ -499,3 +499,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 etl/data/
+
+.docker

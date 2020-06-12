@@ -6,6 +6,9 @@ namespace Covid.Api.GraphQL
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Hosting;
     using Serilog;
+    using Serilog.Exceptions;
+    using Serilog.Exceptions.Core;
+    using Serilog.Exceptions.EntityFrameworkCore.Destructurers;
     using Serilog.Sinks.Elasticsearch;
 
     public class Program
@@ -38,6 +41,10 @@ namespace Covid.Api.GraphQL
 
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
+                .Enrich.WithExceptionDetails(
+                    new DestructuringOptionsBuilder()
+                    .WithDefaultDestructurers()
+                    .WithDestructurers(new [] {new DbUpdateExceptionDestructurer()}))
                 .Enrich.WithMachineName()
                 .WriteTo.Debug()
                 .WriteTo.Console()

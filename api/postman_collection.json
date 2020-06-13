@@ -1,0 +1,255 @@
+{
+	"info": {
+		"_postman_id": "235b54da-d699-4dc1-b295-ce922b055b16",
+		"name": "COVID-19",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GraphQL",
+			"item": [
+				{
+					"name": "What countries do you cover?",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  countries(skip:0, take:5) {\n    countryRegion,\n    provinceState,\n    county,\n    latitude,\n    longitude,\n    population\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "What Provinces do you cover in China?",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"type": "text",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  countries(query: \"China\") {\n\t\tprovinceState\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "What details do you have on Vietnam?",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"type": "text",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  countries(query: \"Vietnam\") {\n    latitude,\n    longitude,\n    population\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "What are the reported deaths for the UK throughout the pandemic?",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"type": "text",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  timeseries(\n    country_region: \"United Kingdom\"\n    province_state: \"\"\n    fields: \"REPORTED_DAILY_DEATHS\"\n  ) {\n    date\n    field\n    value\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "What are the reported deaths, confirmed, covered in the Japan throughout the pandemic?",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"type": "text",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  timeseries(\n    country_region: \"Japan\"\n    province_state: \"\",\n    fields: [\n      \"REPORTED_DAILY_CONFIRMED\"\n      \"REPORTED_DAILY_DEATHS\"\n      \"REPORTED_DAILY_RECOVERED\"\n    ]\n  ) {\n    date\n    field\n    value\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "What are the reported recovered cases in Spain for these dates?",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"type": "text",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  timeseries(\n    country_region: \"Spain\"\n    province_state: \"\",\n    fields: [\n      \"REPORTED_DAILY_RECOVERED\"\n    ],\n    dates: [\n      \"2020-04-15\",\n      \"2020-04-10\"\n    ]\n  ) {\n    date\n    field\n    value\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Multiple Countries / Fields / Dates",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"type": "text",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  timeseries(\n    country_region: [\"United Kingdom\", \"Albania\"]\n    province_state: \"\",\n    fields: [\n      \"REPORTED_DAILY_CONFIRMED\"\n      \"REPORTED_DAILY_DEATHS\"\n      \"REPORTED_DAILY_RECOVERED\"\n    ],\n    dates: [\"2020-06-08\", \"2020-06-07\"],\n    take: 1\n  ) {\n    countryRegion\n    date\n    field\n    value\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pagination Example",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "X-Correlation-ID",
+								"type": "text",
+								"value": "81dce82f-06e4-44d3-bd61-08f9e9598b7b"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  timeseries(\n    country_region: \"US\",\n    province_state: \"\",\n    fields: [\n      \"REPORTED_DAILY_RECOVERED\"\n    ],\n    take: 5\n    skip: 10\n  ) {\n    countryRegion\n    date\n    field\n    value\n  }\n}",
+								"variables": ""
+							},
+							"options": {
+								"graphql": {}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}",
+							"host": [
+								"{{URL}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	]
+}

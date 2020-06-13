@@ -14,10 +14,11 @@ namespace Covid.Api.GraphQL.Query
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using OpenTracing;
+    using Covid.Api.GraphQL.Services;
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(ApiContext sql, ILogger<AppQuery> logger, ITracer tracer)
+        public AppQuery(ApiContext sql, ILogger<AppQuery> logger, ITracer tracer, ITimeSeriesService timeSeriesService)
         {
             #region countries
             this.FieldAsync<ListGraphType<CountryType>>(
@@ -40,7 +41,7 @@ namespace Covid.Api.GraphQL.Query
                         .ThenBy(x => x.ProvinceState)
                         .AsQueryable();
 
-                    if (context.TryGetArgument<string>(Parameters.Queries, out var query))
+                    if (context.TryGetArgument<object, string>(Parameters.Queries, out var query))
                     {
                         query = "%" + query + "%";
                         countries = countries.Where(
@@ -49,8 +50,8 @@ namespace Covid.Api.GraphQL.Query
                                 || EF.Functions.ILike(x.County, query));
                     }
 
-                    if (context.TryGetArgument<int>(Parameters.Take, out var take)) countries = countries.Take(take);
-                    if (context.TryGetArgument<int>(Parameters.Skip, out var skip)) countries = countries.Skip(skip);
+                    if (context.TryGetArgument<object, int>(Parameters.Take, out var take)) countries = countries.Take(take);
+                    if (context.TryGetArgument<object, int>(Parameters.Skip, out var skip)) countries = countries.Skip(skip);
 
                     return await countries
                         .OrderBy(x => x.CountryRegion)
@@ -79,36 +80,9 @@ namespace Covid.Api.GraphQL.Query
                     using var _ = logger.BeginScope(context.Arguments);
 
                     var timeseries = sql.Set<TimeSeries>().OrderByDescending(x => x.Date).AsQueryable();
+                    var result = await timeSeriesService.Query(timeseries, context);
 
-                    if (context.TryGetArgument<List<string>>(Parameters.CountryRegion, out var countries))
-                    {
-                        timeseries = timeseries.Where(x => countries.Contains(x.CountryRegion));
-                    }
-
-                    if (context.TryGetArgument<List<string>>(Parameters.ProvinceState, out var provinces))
-                    {
-                        timeseries = timeseries.Where(x => provinces.Contains(x.ProvinceState));
-                    }
-
-                    if (context.TryGetArgument<List<string>>(Parameters.Counties, out var counties))
-                    {
-                        timeseries = timeseries.Where(x => counties.Contains(x.County));
-                    }
-
-                    if (context.TryGetArgument<List<string>>(Parameters.Fields, out var fields))
-                    {
-                        timeseries = timeseries.Where(x => fields.Contains(x.Field));
-                    }
-
-                    if (context.TryGetArgument<List<DateTime>>(Parameters.Dates, out var dates))
-                    {
-                        timeseries = timeseries.Where(x => dates.Contains(x.Date));
-                    }
-
-                    if (context.TryGetArgument<int>(Parameters.Skip, out var skip)) timeseries = timeseries.Skip(skip);
-                    if (context.TryGetArgument<int>(Parameters.Take, out var take)) timeseries = timeseries.Take(take);
-
-                    return await timeseries.ToListAsync(context.CancellationToken);
+                    return result.ToListAsync(context.CancellationToken);
                 });
             #endregion
         }

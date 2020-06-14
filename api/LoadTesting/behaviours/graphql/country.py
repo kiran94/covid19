@@ -1,6 +1,6 @@
 from locust import TaskSet, task
 
-class GraphQLCountryBehaviour(TaskSet):
+class CountryBehaviour(TaskSet):
     '''
     Simulates Request to the GraphQL Country type.
     '''

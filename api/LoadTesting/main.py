@@ -10,7 +10,8 @@ from locust.log import setup_logging
 from locust.stats import (print_stats, requests_csv, stats_printer,
                           write_csv_files, RequestStats)
 
-from behaviours.graphql_country import GraphQLCountryBehaviour
+from behaviours.graphql.country import CountryBehaviour
+from behaviours.graphql.timeseries import TimeseriesBehaviour
 from client.graphql import GraphQLLocust
 
 if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
@@ -44,7 +45,7 @@ if __name__ == "__main__":
 
     class User(GraphQLLocust):
         host = args.host
-        tasks = [GraphQLCountryBehaviour]
+        tasks = [CountryBehaviour, TimeseriesBehaviour]
         wait_time = between(args.wait_time_min, args.wait_time_max)
 
     logger.info('Setting up Environment and Runner')

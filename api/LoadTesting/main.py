@@ -8,7 +8,7 @@ from locust import HttpUser, between, events, task
 from locust.env import Environment
 from locust.log import setup_logging
 from locust.stats import (print_stats, requests_csv, stats_printer,
-                          write_csv_files)
+                          write_csv_files, RequestStats)
 
 from behaviours.graphql_country import GraphQLCountryBehaviour
 from client.graphql import GraphQLLocust
@@ -72,4 +72,4 @@ if __name__ == "__main__":
     write_csv_files(env, os.path.join(args.output_directory, 'result'), full_history=True)
 
     if args.print_final_statistics:
-        print(env.stats)
+        stats_printer(env.stats)

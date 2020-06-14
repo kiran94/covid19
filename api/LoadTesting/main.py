@@ -1,51 +1,75 @@
+import argparse
+import logging
+import os
+import ssl
+
 import gevent
-from locust import HttpUser, task, between, events
+from locust import HttpUser, between, events, task
 from locust.env import Environment
-from locust.stats import stats_printer, write_csv_files, print_stats, requests_csv
 from locust.log import setup_logging
+from locust.stats import (print_stats, requests_csv, stats_printer,
+                          write_csv_files)
+
 from behaviours.graphql_country import GraphQLCountryBehaviour
 from client.graphql import GraphQLLocust
-import os, ssl
 
 if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
     ssl._create_default_https_context = ssl._create_unverified_context
 
-setup_logging("DEBUG")
 
-class User(GraphQLLocust):
-    host = "https://localhost:5001/graphql"
-    tasks = [GraphQLCountryBehaviour]
-    wait_time = between(1, 10)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-ho', '--host', default='https://localhost:5001/graphql')
+    parser.add_argument('--wait-time-min', default=1, type=int, help='Default minimum wait time between tasks')
+    parser.add_argument('--wait-time-max', default=10, type=int, help='Default maximum wait time between tasks')
+    parser.add_argument('-w', '--web', action='store_true', help='Enable Web UI')
+    parser.add_argument('-wh', '--web-host', default='127.0.0.1', help='Address to host the Web UI')
+    parser.add_argument('-wp', '--web-port', default=8089, type=int, help='Port to host the Web UI')
+    parser.add_argument('-u', '--number-of-users', default=10, type=int, help='Number of Users to start')
+    parser.add_argument('-uh', '--user-hatch-rate', default=5, type=int, help='Number of Users to spawn per second')
+    parser.add_argument('-d', '--duration', default=60, type=int, help='Duration of the load test (in seconds)')
+    parser.add_argument('-o', '--output_directory', default='results', type=str, help='Output directory to put results')
+    parser.add_argument('-f', '--print_final_statistics', action='store_true', default=True, help='Print the final statistics before exit')
+    parser.add_argument('-v', '--verbosity', default="INFO", type=str, help='Set the logging level', choices=['DEBUG', 'INFO', 'WARN', 'ERROR'])
 
+    args = parser.parse_args()
 
+    setup_logging(args.verbosity)
+    logger = logging.getLogger('covid.load.testing')
 
-# setup Environment and Runner
-env = Environment(user_classes=[User], events=events)
-env.create_local_runner()
+    logger.info(args)
 
-# start a WebUI instance
-env.create_web_ui("127.0.0.1", 8089)
+    print(args)
+    logger.info('Initialising Load Testing')
 
-# start a greenlet that periodically outputs the current stats
-gevent.spawn(stats_printer(env.stats))
+    class User(GraphQLLocust):
+        host = args.host
+        tasks = [GraphQLCountryBehaviour]
+        wait_time = between(args.wait_time_min, args.wait_time_max)
 
-# start the test
-number_of_users=10
-hatch_user_rate=5
-env.runner.start(number_of_users, hatch_rate=hatch_user_rate)
+    logger.info('Setting up Environment and Runner')
+    env = Environment(user_classes=[User], events=events)
+    env.create_local_runner()
 
-# in 60 seconds stop the runner
-gevent.spawn_later(60, lambda: env.runner.quit())
+    if args.web:
+        logger.info(f'Launching Web UI in {args.web_host}:{args.web_port}')
+        env.create_web_ui(args.web_host, args.web_port)
 
-# wait for the greenlets
-env.runner.greenlet.join()
+    gevent.spawn(stats_printer(env.stats))
 
-# stop the web server for good measures
-env.web_ui.stop()
+    logger.info(f'Starting Run with {args.number_of_users} users with hatch rate {args.user_hatch_rate}')
+    env.runner.start(args.number_of_users, hatch_rate=args.user_hatch_rate)
 
-# env.stats.write_stat_csvs('Example')
+    gevent.spawn_later(args.duration, lambda: env.runner.quit())
+    env.runner.greenlet.join()
 
-write_csv_files(env, 'load', full_history=True)
-hello = requests_csv(env.stats)
-print(hello)
-# print_stats(env.stats)
+    if args.web:
+        logger.debug('Stopping Web UI')
+        env.web_ui.stop()
+
+    logger.info(f'Writing results to output directory {args.output_directory}')
+    os.makedirs(args.output_directory, exist_ok=True)
+    write_csv_files(env, os.path.join(args.output_directory, 'result'), full_history=True)
+
+    if args.print_final_statistics:
+        print(env.stats)

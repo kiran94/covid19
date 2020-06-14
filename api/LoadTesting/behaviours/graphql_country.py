@@ -20,27 +20,27 @@ class GraphQLCountryBehaviour(TaskSet):
             }
         '''
 
-        self.client.execute('get_all_countries', query)
+        self.client.execute(self.get_all_countries.__name__, query)
 
-    # @task
-    # def get_all_countries_paginate(self):
-    #     query = '''
-    #         query request($skip: Int, $take: Int) {
-    #             countries(skip: $skip, take: $take) {
-    #                 countryRegion,
-    #                 provinceState,
-    #                 county,
-    #                 latitude,
-    #                 longitude,
-    #                 population
-    #             }
-    #         }
-    #     '''
+    @task
+    def get_all_countries_paginate(self):
+        query = '''
+            query request($skip: Int, $take: Int) {
+                countries(skip: $skip, take: $take) {
+                    countryRegion,
+                    provinceState,
+                    county,
+                    latitude,
+                    longitude,
+                    population
+                }
+            }
+        '''
 
-    #     variables = {
-    #         'skip': 0,
-    #         'take': 10
-    #     }
+        variables = {
+            'skip': 0,
+            'take': 10
+        }
 
-    #     self.client.execute("request", query, variables)
+        self.client.execute(self.get_all_countries_paginate.__name__, query, variables)
 

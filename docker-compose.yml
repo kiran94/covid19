@@ -1,4 +1,5 @@
 version: '3.1'
+
 services:
 
   etl_database:
@@ -11,6 +12,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${COVID_DATABASE_NAME}
+    networks:
+      - database
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -22,6 +25,8 @@ services:
         - "16686:16686"
         - "14268:14268"
         - "9411:9411"
+    networks:
+      - tracing
 
   elasticsearch:
     container_name: elasticsearch
@@ -46,9 +51,32 @@ services:
     depends_on:
       - elasticsearch
     environment:
-      - ELASTICSEARCH_URL=http://localhost:9200
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
     networks:
       - elastic
+
+  graphql_api:
+    build:
+      context: ./api/
+      dockerfile: graphql.Dockerfile
+    ports:
+      - 5000:80
+    depends_on:
+      - etl_database
+      - elasticsearch
+      - kibana
+      - jaeger
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      POSTGRES_HOST: etl_database
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      COVID_DATABASE_NAME: ${COVID_DATABASE_NAME}
+      ELASTICSEARCH_URL: ${ELASTICSEARCH_URL}
+    networks:
+      - elastic
+      - database
+      - tracing
 
 volumes:
   etl_database:
@@ -56,4 +84,8 @@ volumes:
 
 networks:
   elastic:
+    driver: bridge
+  database:
+    driver: bridge
+  tracing:
     driver: bridge

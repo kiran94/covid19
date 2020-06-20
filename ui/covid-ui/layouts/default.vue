@@ -2,7 +2,7 @@
   <v-app>
     <!-- MENU BAR -->
     <v-app-bar app flat class="primary" max-height="70">
-       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-spacer />
       <v-toolbar-title class="display-3 white--text">{{
         title
@@ -10,14 +10,15 @@
       <v-spacer />
     </v-app-bar>
 
-    <v-navigation-drawer
-      v-model="drawer"
-      width="500"
-      fixed
-      app>
-
-      <Search></Search>
-
+    <v-navigation-drawer v-model="drawer" width="500" fixed app>
+      <v-expansion-panels multiple>
+        <v-expansion-panel>
+          <v-expansion-panel-header>Search</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <Search></Search>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-navigation-drawer>
 
     <!-- CONTENT -->

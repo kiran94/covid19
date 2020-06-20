@@ -2,6 +2,7 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   mode: 'universal',
+  telemetry: false,
   /*
   ** Headers of the page
   */

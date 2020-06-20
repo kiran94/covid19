@@ -9,8 +9,9 @@
         <v-date-picker
           v-model="selectedDateRange"
           range
-          header-color="primary"
+          color="primary"
           no-title
+          full-width
         />
       </v-card-actions>
     </v-card>

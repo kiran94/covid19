@@ -1,32 +1,20 @@
 <template>
-  <v-layout
-    column
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-
+  <v-layout column>
+    <v-flex xs12 sm8 md6>
       <v-row>
-
         <v-col sm="12" md="4">
           <SearchCountry v-model="searchedCountry"></SearchCountry>
           <SearchField v-model="searchedFields"></SearchField>
           <SearchDate v-model="selectedDates"></SearchDate>
-          <v-btn depressed color="primary" @click="search" block class="mt-2" >Search</v-btn>
+          <v-btn depressed color="primary" @click="search" block class="mt-2"
+            >Search</v-btn
+          >
         </v-col>
 
-        <v-col sm="12" md="3">
+        <v-col sm="12" md="3"> </v-col>
 
-        </v-col>
-
-        <v-col sm="12" md="3">
-
-        </v-col>
-
+        <v-col sm="12" md="3"> </v-col>
       </v-row>
-
     </v-flex>
   </v-layout>
 </template>

@@ -67,13 +67,25 @@ export default {
   },
   watch: {
     selectedCountry: function(val) {
-      this.$emit('input', [this.selectedCountry, this.selectedState, this.selectedCounty])
+      this.$emit('input', [
+        this.selectedCountry,
+        this.selectedState,
+        this.selectedCounty
+      ])
     },
     selectedState: function(val) {
-      this.$emit('input', [this.selectedCountry, this.selectedState, this.selectedCounty])
+      this.$emit('input', [
+        this.selectedCountry,
+        this.selectedState,
+        this.selectedCounty
+      ])
     },
     selectedCounty: function(val) {
-      this.$emit('input', [this.selectedCountry, this.selectedState, this.selectedCounty])
+      this.$emit('input', [
+        this.selectedCountry,
+        this.selectedState,
+        this.selectedCounty
+      ])
     }
   }
 }

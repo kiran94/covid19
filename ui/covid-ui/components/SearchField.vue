@@ -6,7 +6,6 @@
       </v-card-title>
 
       <v-card-actions>
-
         <v-autocomplete
           :items="fields"
           item-text="iD"

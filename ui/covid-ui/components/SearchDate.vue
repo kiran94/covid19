@@ -5,8 +5,13 @@
         Select Dates
       </v-card-title>
 
-      <v-card-actions>
-        <v-date-picker v-model="selectedDateRange" range header-color="primary" no-title />
+      <v-card-actions class="justify-center">
+        <v-date-picker
+          v-model="selectedDateRange"
+          range
+          header-color="primary"
+          no-title
+        />
       </v-card-actions>
     </v-card>
   </div>

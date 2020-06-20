@@ -10,7 +10,8 @@
           :items="fields"
           item-text="iD"
           v-model="selectedField"
-          autocomplete="no"
+          autocomplete="new"
+          color="primary"
           chips
           deletable-chips
           multiple

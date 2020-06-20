@@ -11,7 +11,7 @@
           :items="countries"
           item-text="countryRegion"
           v-model="selectedCountry"
-          autocomplete="no"
+          autocomplete="new"
         />
       </v-card-actions>
 
@@ -21,7 +21,7 @@
           :items="states"
           item-text="provinceState"
           v-model="selectedState"
-          autocomplete="off"
+          autocomplete="new"
         />
       </v-card-actions>
 
@@ -31,7 +31,7 @@
           :items="counties"
           item-text="county"
           v-model="selectedCounty"
-          autocomplete="off"
+          autocomplete="new"
         />
       </v-card-actions>
     </v-card>

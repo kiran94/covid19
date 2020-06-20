@@ -20,6 +20,7 @@ namespace Covid.Api.GraphQL
     using Serilog;
     using CorrelationId.DependencyInjection;
     using CorrelationId;
+    using Covid.Api.Common.Services.Field;
 
     public class Startup
     {
@@ -97,6 +98,9 @@ namespace Covid.Api.GraphQL
 
                 return tracer;
             });
+
+            // DOMAIN SERVICES
+            services.AddSingleton<IFieldService, FieldService>();
 
             services.AddOpenTracing();
             services.AddControllers();

@@ -1,7 +1,6 @@
 
 namespace Covid.Api.GraphQL.Query
 {
-    using System.Threading;
     using System;
     using System.Linq;
     using Covid.Api.Common.DataAccess;
@@ -11,13 +10,13 @@ namespace Covid.Api.GraphQL.Query
     using global::GraphQL.Types;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using OpenTracing;
+    using Covid.Api.Common.Services.Field;
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(ApiContext sql, ILogger<AppQuery> logger, ITracer tracer)
+        public AppQuery(ApiContext sql, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields)
         {
             #region countries
             this.FieldAsync<ListGraphType<CountryType>>(
@@ -109,6 +108,16 @@ namespace Covid.Api.GraphQL.Query
                     if (context.TryGetArgument<int>(Parameters.Take, out var take)) timeseries = timeseries.Take(take);
 
                     return await timeseries.ToListAsync(context.CancellationToken);
+                });
+            #endregion
+
+            #region fields
+            this.FieldAsync<ListGraphType<GraphQL.Types.FieldType>>(
+                "fields",
+                description: "Gets Fields tracked under data",
+                resolve: async context => {
+                    tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
+                    return await fields.GetAll();
                 });
             #endregion
         }

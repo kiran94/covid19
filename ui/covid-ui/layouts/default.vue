@@ -10,6 +10,7 @@
       <v-spacer />
     </v-app-bar>
 
+    <!-- NAVIGATION DRAWER -->
     <v-navigation-drawer v-model="drawer" width="500" fixed app>
       <v-expansion-panels multiple>
         <v-expansion-panel>

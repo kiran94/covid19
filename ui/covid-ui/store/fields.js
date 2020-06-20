@@ -7,10 +7,8 @@ export const mutations = {
 }
 
 export const actions = {
-
   async fetchFields({ commit }) {
-    const data = await this.$axios.$post('/graphql',
-    {
+    const data = await this.$axios.$post('/graphql', {
       query: `
         query {
           fields {
@@ -19,11 +17,6 @@ export const actions = {
           }
         }
         `
-    },
-    {
-      headers: {
-        'Content-Type': 'application/json'
-      }
     })
 
     commit('setFields', data['data']['fields'])

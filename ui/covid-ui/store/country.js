@@ -8,9 +8,8 @@ export const mutations = {
 
 export const actions = {
   async fetchCountries({ commit }) {
-    const data = await this.$axios.$post('/graphql',
-      {
-        query: `
+    const data = await this.$axios.$post('/graphql', {
+      query: `
       query {
           countries {
             countryRegion,
@@ -19,13 +18,7 @@ export const actions = {
         }
       }
     `
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    )
+    })
 
     commit('setCountries', data['data']['countries'])
   }

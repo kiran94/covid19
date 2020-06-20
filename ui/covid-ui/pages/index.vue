@@ -60,6 +60,8 @@ export default {
       }
 
       console.log(request)
+
+      this.$store.commit('selected/addRequest', request)
       console.groupEnd()
     }
   }

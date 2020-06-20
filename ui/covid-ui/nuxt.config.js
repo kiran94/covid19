@@ -29,8 +29,7 @@ export default {
   /*
   ** Plugins to load before mounting the App
   */
-  plugins: [
-  ],
+  plugins: [],
   /*
   ** Nuxt.js dev-modules
   */
@@ -39,6 +38,7 @@ export default {
     // Doc: https://github.com/nuxt-community/stylelint-module
     '@nuxtjs/stylelint-module',
     '@nuxtjs/vuetify',
+    'nuxt-vuex-localstorage'
   ],
   /*
   ** Nuxt.js modules

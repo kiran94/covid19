@@ -33,6 +33,16 @@
 export default {
   created: function() {
     this.$store.dispatch('country/fetchCountries')
+
+    const theme = this.$store.state.localStorage.useDarkMode
+
+    if (theme) {
+      this.$vuetify.theme.dark = true
+    } else {
+      this.$vuetify.theme.dark = false
+    }
+
+    this.dark = this.$vuetify.theme.dark
   },
   data() {
     return {
@@ -51,6 +61,7 @@ export default {
   watch: {
     dark: function(val) {
       this.$vuetify.theme.dark = val
+      this.$store.commit('localStorage/setDarkMode', val)
     }
   }
 }

@@ -23,6 +23,7 @@
 
 <script>
 export default {
+  props: ['value'],
   data: function() {
     return {
       selectedField: []
@@ -31,6 +32,11 @@ export default {
   computed: {
     fields: function() {
       return this.$store.state.fields.fields
+    }
+  },
+  watch: {
+    selectedField: function(val) {
+      this.$emit('input', val)
     }
   }
 }

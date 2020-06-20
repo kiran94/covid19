@@ -14,9 +14,15 @@
 
 <script>
 export default {
+  props: ['value'],
   data: function() {
     return {
       selectedDateRange: []
+    }
+  },
+  watch: {
+    selectedDateRange: function(val) {
+      this.$emit('input', val)
     }
   }
 }

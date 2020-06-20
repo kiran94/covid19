@@ -7,7 +7,6 @@
 
       <v-card-actions>
         <v-card-subtitle>Country</v-card-subtitle>
-
         <v-autocomplete
           :items="countries"
           item-text="countryRegion"
@@ -18,7 +17,6 @@
 
       <v-card-actions>
         <v-card-subtitle>States</v-card-subtitle>
-
         <v-autocomplete
           :items="states"
           item-text="provinceState"
@@ -29,7 +27,6 @@
 
       <v-card-actions>
         <v-card-subtitle>County</v-card-subtitle>
-
         <v-autocomplete
           :items="counties"
           item-text="county"
@@ -43,6 +40,7 @@
 
 <script>
 export default {
+  props: ['value'],
   data: function() {
     return {
       selectedCountry: null,
@@ -65,6 +63,17 @@ export default {
           x.countryRegion == this.selectedCountry &&
           x.provinceState == this.selectedState
       )
+    }
+  },
+  watch: {
+    selectedCountry: function(val) {
+      this.$emit('input', [this.selectedCountry, this.selectedState, this.selectedCounty])
+    },
+    selectedState: function(val) {
+      this.$emit('input', [this.selectedCountry, this.selectedState, this.selectedCounty])
+    },
+    selectedCounty: function(val) {
+      this.$emit('input', [this.selectedCountry, this.selectedState, this.selectedCounty])
     }
   }
 }

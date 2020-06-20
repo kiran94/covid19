@@ -10,10 +10,10 @@
 
       <v-row>
 
-        <v-col sm="12" md="2">
-          <SearchCountry></SearchCountry>
-          <SearchField></SearchField>
-          <SearchDate></SearchDate>
+        <v-col sm="12" md="4">
+          <SearchCountry v-model="searchedCountry"></SearchCountry>
+          <SearchField v-model="searchedFields"></SearchField>
+          <SearchDate v-model="selectedDates"></SearchDate>
           <v-btn depressed color="primary" @click="search" block class="mt-2" >Search</v-btn>
         </v-col>
 
@@ -42,9 +42,25 @@ export default {
     SearchField,
     SearchDate
   },
+  data: function() {
+    return {
+      searchedCountry: [],
+      searchedFields: [],
+      selectedDates: []
+    }
+  },
   methods: {
     search() {
-      console.log('Search Clicked')
+      console.group('Submitted Search')
+
+      const request = {
+        country: this.searchedCountry,
+        fields: this.searchedFields,
+        dates: this.selectedDates
+      }
+
+      console.log(request)
+      console.groupEnd()
     }
   }
 }

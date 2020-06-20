@@ -1,6 +1,6 @@
 <template>
   <div class="search_country">
-    <v-card tile>
+    <v-card>
       <v-card-title class="headline">
         Search Country
       </v-card-title>

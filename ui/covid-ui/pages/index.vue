@@ -10,16 +10,19 @@
 
       <v-row>
 
-        <v-col sm="12" md="3">
+        <v-col sm="12" md="2">
           <SearchCountry></SearchCountry>
-        </v-col>
-
-        <v-col sm="12" md="3">
           <SearchField></SearchField>
+          <SearchDate></SearchDate>
+          <v-btn depressed color="primary" @click="search" block class="mt-2" >Search</v-btn>
         </v-col>
 
         <v-col sm="12" md="3">
-          <SearchDate></SearchDate>
+
+        </v-col>
+
+        <v-col sm="12" md="3">
+
         </v-col>
 
       </v-row>
@@ -38,6 +41,11 @@ export default {
     SearchCountry,
     SearchField,
     SearchDate
+  },
+  methods: {
+    search() {
+      console.log('Search Clicked')
+    }
   }
 }
 </script>

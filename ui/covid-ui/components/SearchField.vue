@@ -1,12 +1,11 @@
 <template>
   <div id="search_field">
-    <v-card>
+    <v-card tile>
       <v-card-title class="headline">
         Search Field
       </v-card-title>
 
       <v-card-actions>
-        <v-card-subtitle>Field</v-card-subtitle>
 
         <v-autocomplete
           :items="fields"

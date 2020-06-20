@@ -33,6 +33,7 @@
 export default {
   created: function() {
     this.$store.dispatch('country/fetchCountries')
+    this.$store.dispatch('fields/fetchFields')
 
     const theme = this.$store.state.localStorage.useDarkMode
 

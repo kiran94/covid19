@@ -15,7 +15,7 @@
         </v-col>
 
         <v-col sm="12" md="3">
-          <!-- <SearchCountry></SearchCountry> -->
+          <SearchField></SearchField>
         </v-col>
 
         <v-col sm="12" md="3">
@@ -30,10 +30,12 @@
 
 <script>
 import SearchCountry from '~/components/SearchCountry'
+import SearchField from '~/components/SearchField'
 
 export default {
   components: {
-    SearchCountry
+    SearchCountry,
+    SearchField
   }
 }
 </script>

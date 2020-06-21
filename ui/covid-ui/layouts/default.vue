@@ -8,6 +8,14 @@
         title
       }}</v-toolbar-title>
       <v-spacer />
+        <template v-slot:extension>
+          <v-tabs align-with-title class="mt-2">
+            <v-tab to="/" nuxt>Home</v-tab>
+            <v-tab to="/CountryOverview" nuxt>Country Overview</v-tab>
+            <v-tab to="/GlobalOverview" nuxt>Global Overview</v-tab>
+            <v-tab><v-badge content="beta">Country Comparison</v-badge></v-tab>
+          </v-tabs>
+        </template>
     </v-app-bar>
 
     <!-- NAVIGATION DRAWER -->
@@ -25,7 +33,7 @@
     <!-- CONTENT -->
     <v-main>
       <v-container fluid>
-        <nuxt />
+        <nuxt keep-alive />
       </v-container>
     </v-main>
 

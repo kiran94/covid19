@@ -1,12 +1,12 @@
 <template>
   <div class="search_country">
     <v-card>
-      <v-card-title class="headline">
+      <v-card-title class="headline" v-if="!hideTitle">
         Search Country
       </v-card-title>
 
-      <v-card-actions>
-        <v-card-subtitle>Country</v-card-subtitle>
+      <v-card-actions v-if="!hideCountry">
+        <v-card-subtitle v-if="!hideSubtitle">Country</v-card-subtitle>
         <v-autocomplete
           :items="countries"
           item-text="countryRegion"
@@ -15,8 +15,8 @@
         />
       </v-card-actions>
 
-      <v-card-actions>
-        <v-card-subtitle>States</v-card-subtitle>
+      <v-card-actions v-if="!hideState">
+        <v-card-subtitle v-if="!hideSubtitle">States</v-card-subtitle>
         <v-autocomplete
           :items="states"
           item-text="provinceState"
@@ -25,8 +25,8 @@
         />
       </v-card-actions>
 
-      <v-card-actions>
-        <v-card-subtitle>County</v-card-subtitle>
+      <v-card-actions v-if="!hideCounty">
+        <v-card-subtitle v-if="!hideSubtitle">County</v-card-subtitle>
         <v-autocomplete
           :items="counties"
           item-text="county"
@@ -40,7 +40,14 @@
 
 <script>
 export default {
-  props: ['value'],
+  props: {
+    value: Array,
+    hideCountry: Boolean,
+    hideState: Boolean,
+    hideCounty: Boolean,
+    hideTitle: Boolean,
+    hideSubtitle: Boolean
+  },
   data: function() {
     return {
       selectedCountry: null,

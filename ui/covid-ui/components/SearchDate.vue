@@ -1,7 +1,7 @@
 <template>
   <div id="search_date">
     <v-card tile>
-      <v-card-title class="headline">
+      <v-card-title class="headline" v-if="!hideTitle">
         Select Dates
       </v-card-title>
 
@@ -20,7 +20,10 @@
 
 <script>
 export default {
-  props: ['value'],
+  props: {
+    value: Array,
+    hideTitle: Boolean
+  },
   data: function() {
     return {
       selectedDateRange: []

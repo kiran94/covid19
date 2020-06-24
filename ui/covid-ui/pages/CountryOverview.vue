@@ -127,6 +127,7 @@ export default {
         'REPORTED_DAILY_RECOVERED'
       )
 
+      this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()
       console.groupEnd()
     },

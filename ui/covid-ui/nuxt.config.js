@@ -49,7 +49,8 @@ export default {
     '@nuxtjs/axios',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
-    'nuxt-vue-select'
+    'nuxt-vue-select',
+    'vue-toastification/nuxt'
   ],
   /*
   ** Axios module configuration
@@ -87,6 +88,11 @@ export default {
         }
       }
     }
+  },
+  toast: {
+    timeout: 2000,
+    closeOnClick: false,
+    transition: 'Vue-Toastification__fade'
   },
   /*
   ** Build configuration

@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
+require('dotenv').config()
 
 export default {
   mode: 'universal',
@@ -57,10 +58,13 @@ export default {
   ** See https://axios.nuxtjs.org/options
   */
   axios: {
-    baseURL: 'http://localhost:5000',
+    proxy: true,
     common: {
       'Content-Type': 'application/json'
     }
+  },
+  proxy: {
+    '/graphql': process.env.API_BASE_URL
   },
   /*
   ** vuetify module configuration

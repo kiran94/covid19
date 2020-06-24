@@ -60,20 +60,9 @@ export default {
   created: function() {
     this.$store.dispatch('country/fetchCountries')
     this.$store.dispatch('fields/fetchFields')
-
-    const theme = this.$store.state.localStorage.useDarkMode
-
-    if (theme) {
-      this.$vuetify.theme.dark = true
-    } else {
-      this.$vuetify.theme.dark = false
-    }
-
-    this.dark = this.$vuetify.theme.dark
   },
   data() {
     return {
-      dark: false,
       drawer: true,
       items: [
         {
@@ -86,10 +75,16 @@ export default {
       title: 'COVID-19'
     }
   },
-  watch: {
-    dark: function(val) {
-      this.$vuetify.theme.dark = val
-      this.$store.commit('localStorage/setDarkMode', val)
+  computed: {
+    dark: {
+      get: function() {
+        const val = this.$store.state.settings.useDarkMode
+        this.$vuetify.theme.dark = val
+        return val
+      },
+      set: function(newVal) {
+        this.$store.commit('settings/setDarkMode', newVal)
+      }
     }
   }
 }

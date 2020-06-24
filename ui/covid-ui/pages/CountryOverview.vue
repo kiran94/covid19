@@ -171,14 +171,16 @@ export default {
             $province_state: [String],
             $counties: [String],
             $fields: [String],
-            $take: Int) {
+            $take: Int,
+            $chronological: Boolean) {
 
               timeseries(
                 country_region: $country_region,
                 province_state: $province_state,
                 counties: $counties,
                 fields: $fields,
-                take: $take) {
+                take: $take,
+                chronological: $chronological) {
                   date,
                   field,
                   value
@@ -190,7 +192,8 @@ export default {
           province_state: '',
           counties: '',
           fields: fields,
-          take: this.request.take
+          take: this.request.take,
+          chronological: true
         }
       })
 

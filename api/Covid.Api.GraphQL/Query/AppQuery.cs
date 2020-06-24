@@ -1,4 +1,3 @@
-
 namespace Covid.Api.GraphQL.Query
 {
     using System;
@@ -68,7 +67,8 @@ namespace Covid.Api.GraphQL.Query
                     Parameters.Argument<ListGraphType<StringGraphType>>(Parameters.Fields),
                     Parameters.Argument<ListGraphType<DateTimeGraphType>>(Parameters.Dates),
                     Parameters.Argument<IntGraphType>(Parameters.Take),
-                    Parameters.Argument<IntGraphType>(Parameters.Skip)
+                    Parameters.Argument<IntGraphType>(Parameters.Skip),
+                    Parameters.Argument<BooleanGraphType>(Parameters.Chronological)
                 },
                 resolve: async context =>
                 {
@@ -77,7 +77,16 @@ namespace Covid.Api.GraphQL.Query
                     logger.LogInformation("Getting TimeSeries Information");
                     using var _ = logger.BeginScope(context.Arguments);
 
-                    var timeseries = sql.Set<TimeSeries>().OrderByDescending(x => x.Date).AsQueryable();
+                    var timeseries = sql.Set<TimeSeries>().AsQueryable();
+
+                    if (context.TryGetArgument<bool>(Parameters.Chronological, out var chronological) && chronological)
+                    {
+                        timeseries = timeseries.OrderBy(x => x.Date);
+                    }
+                    else
+                    {
+                        timeseries = timeseries.OrderByDescending(x => x.Date);
+                    }
 
                     if (context.TryGetArgument<List<string>>(Parameters.CountryRegion, out var countries))
                     {

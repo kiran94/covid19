@@ -80,6 +80,11 @@ export default {
     SearchDate,
     LineChart
   },
+  head() {
+    return {
+      title: 'CountryOverview'
+    }
+  },
   data: function() {
     return {
       request: {

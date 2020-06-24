@@ -592,3 +592,6 @@ sw.*
 
 # Vim swap files
 *.swp
+
+
+!ui/covid-ui/.env

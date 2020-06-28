@@ -97,6 +97,36 @@
             </v-col>
           </v-row>
         </div>
+
+        <div id="rollingAverages">
+          <v-row><h2>Rolling Averages</h2></v-row>
+
+          <v-row>
+            <v-col cols="4">
+              <h3>Deaths</h3>
+              <LineChart
+                :data="chartData.rollingAverages.deaths"
+                :options="chartOptions"
+              />
+            </v-col>
+
+            <v-col cols="4">
+              <h3>Confirmed</h3>
+              <LineChart
+                :data="chartData.rollingAverages.confirmed"
+                :options="chartOptions"
+              />
+            </v-col>
+
+            <v-col cols="4">
+              <h3>Recovered</h3>
+              <LineChart
+                :data="chartData.rollingAverages.recovered"
+                :options="chartOptions"
+              />
+            </v-col>
+          </v-row>
+        </div>
       </div>
     </v-flex>
   </v-layout>
@@ -123,7 +153,7 @@ export default {
       request: {
         selectedCountry: [],
         selectedDate: [],
-        take: 500
+        take: 5000
       },
       timeseries: {
         reportedDailies: null
@@ -135,6 +165,11 @@ export default {
           recovered: null
         },
         reportedTotals: {
+          deaths: null,
+          confirmed: null,
+          recovered: null
+        },
+        rollingAverages: {
           deaths: null,
           confirmed: null,
           recovered: null
@@ -151,6 +186,7 @@ export default {
       this.$nuxt.$loading.start()
 
       const fields = [
+        // Dailies
         this.$store.state.fields.fields.find(
           (x) => x.iD == 'REPORTED_DAILY_CONFIRMED'
         ),
@@ -161,6 +197,7 @@ export default {
           (x) => x.iD == 'REPORTED_DAILY_RECOVERED'
         ),
 
+        // Totals
         this.$store.state.fields.fields.find(
           (x) => x.iD == 'REPORTED_TOTAL_CONFIRMED'
         ),
@@ -169,6 +206,28 @@ export default {
         ),
         this.$store.state.fields.fields.find(
           (x) => x.iD == 'REPORTED_TOTAL_RECOVERED'
+        ),
+
+        // Average Deaths
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_SEVENDAY_DEATHS'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_FOURTEENDAY_DEATHS'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_TWENTYONEDAY_DEATHS'
+        ),
+
+        // Averages Confirmed
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_SEVENDAY_CONFIRMED'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_FOURTEENDAY_CONFIRMED'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_TWENTYONEDAY_CONFIRMED'
         )
       ]
 
@@ -202,15 +261,24 @@ export default {
         fields[5]
       )
 
+      this.chartData.rollingAverages.deaths = this.generateGraphMultiple(
+        this.timeseries.reportedDailies,
+        [fields[6], fields[7], fields[8]],
+        this.chartData.rollingAverages.deaths
+      )
+
+      this.chartData.rollingAverages.confirmed = this.generateGraphMultiple(
+        this.timeseries.reportedDailies,
+        [fields[9], fields[10], fields[11]],
+        this.chartData.rollingAverages.confirmed
+      )
+
       this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()
       console.groupEnd()
     },
 
     generateGraph(data, fieldInfo, chartData = null, fill = false) {
-      console.debug(data)
-      console.debug(fieldInfo)
-
       const records = data.filter((x) => x.field == fieldInfo.iD)
       const dates = records.map((x) => x.date)
       const values = records.map((x) => x.value)
@@ -226,6 +294,18 @@ export default {
         chartData = { labels: dates, datasets: [newLine] }
       } else {
         chartData.datasets.push(newLine)
+      }
+
+      return chartData
+    },
+
+    generateGraphMultiple(data, fieldInfos, chartData = null, fill = false) {
+      for (let i = 0; i < fieldInfos.length; i++) {
+        if (i == 0) {
+          chartData = this.generateGraph(data, fieldInfos[i], null, fill)
+        } else {
+          chartData = this.generateGraph(data, fieldInfos[i], chartData, fill)
+        }
       }
 
       return chartData

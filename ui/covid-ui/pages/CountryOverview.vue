@@ -132,28 +132,29 @@ export default {
         'REPORTED_DAILY_RECOVERED'
       )
 
-      this.$toast.success('Loaded Country')
+      this.$toast.success('Loaded Country') 
       this.$nuxt.$loading.finish()
       console.groupEnd()
     },
 
-    generateGraph(data, field) {
+    generateGraph(data, field, chartData = null) {
       console.log(data)
 
       const records = data.filter((x) => x.field == field)
       const dates = records.map((x) => x.date)
       const values = records.map((x) => x.value)
 
-      const chartData = {
-        labels: dates,
-        datasets: [
-          {
-            label: field,
-            borderColor: '#41B38A',
-            fill: false,
-            data: values
-          }
-        ]
+      const newLine = {
+              label: field,
+              borderColor: '#41B38A',
+              fill: false,
+              data: values
+      }
+
+      if (chartData == null) {
+        chartData = { labels: dates, datasets: [newLine] }
+      } else {
+        chartData.datasets.push(newLine)
       }
 
       return chartData

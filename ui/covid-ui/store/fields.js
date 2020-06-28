@@ -12,8 +12,9 @@ export const actions = {
       query: `
         query {
           fields {
-            iD,
+            iD
             description
+            color
           }
         }
         `

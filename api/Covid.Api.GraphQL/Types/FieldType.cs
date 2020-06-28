@@ -9,6 +9,7 @@ namespace Covid.Api.GraphQL.Types
         {
             this.Field(x => x.ID);
             this.Field(x => x.Description, nullable: true);
+            this.Field(x => x.Color, nullable: true);
         }
     }
 }

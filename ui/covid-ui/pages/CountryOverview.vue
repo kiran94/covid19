@@ -111,52 +111,34 @@ export default {
       console.group('Loading Reported Daily Data')
       this.$nuxt.$loading.start()
 
-      // TODO: Replace these mappings with state in vuex fields.js
-
       const fields = [
-        'REPORTED_DAILY_CONFIRMED',
-        'REPORTED_DAILY_DEATHS',
-        'REPORTED_DAILY_RECOVERED'
+        this.$store.state.fields.fields.find(x => x.iD == 'REPORTED_DAILY_CONFIRMED'),
+        this.$store.state.fields.fields.find(x => x.iD == 'REPORTED_DAILY_DEATHS'),
+        this.$store.state.fields.fields.find(x => x.iD == 'REPORTED_DAILY_RECOVERED'),
       ]
 
-      this.timeseries.reportedDailies = await this.loadData(fields)
+      this.timeseries.reportedDailies = await this.loadData(fields.map(x => x.iD))
 
-      this.chartData.reportedDailyDeaths = this.generateGraph(
-        this.timeseries.reportedDailies,
-        'REPORTED_DAILY_DEATHS'
-      )
-      this.chartData.reportedDailyConfirmed = this.generateGraph(
-        this.timeseries.reportedDailies,
-        'REPORTED_DAILY_CONFIRMED'
-      )
-
-      this.chartData.reportedDailyRecovered = this.generateGraph(
-        this.timeseries.reportedDailies,
-        'REPORTED_DAILY_RECOVERED'
-      )
-
-      this.chartData.reportedDailyDeaths = this.generateGraph(
-        this.timeseries.reportedDailies,
-        'REPORTED_DAILY_RECOVERED',
-        this.chartData.reportedDailyDeaths,
-        '#fbd5bd'
-      )
+      this.chartData.reportedDailyConfirmed = this.generateGraph(this.timeseries.reportedDailies, fields[0])
+      this.chartData.reportedDailyDeaths = this.generateGraph(this.timeseries.reportedDailies, fields[1])
+      this.chartData.reportedDailyRecovered = this.generateGraph(this.timeseries.reportedDailies, fields[2])
 
       this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()
       console.groupEnd()
     },
 
-    generateGraph(data, field, chartData = null, borderColor = '#41B38A', fill = false) {
-      console.log(data)
+    generateGraph(data, fieldInfo, chartData = null, fill = false) {
+      console.debug(data)
+      console.debug(fieldInfo)
 
-      const records = data.filter((x) => x.field == field)
+      const records = data.filter((x) => x.field == fieldInfo.iD)
       const dates = records.map((x) => x.date)
       const values = records.map((x) => x.value)
 
       const newLine = {
-        label: field,
-        borderColor: borderColor,
+        label: fieldInfo.description,
+        borderColor: fieldInfo.color,
         fill: fill,
         data: values
       }

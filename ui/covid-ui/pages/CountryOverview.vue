@@ -127,17 +127,25 @@ export default {
         this.timeseries.reportedDailies,
         'REPORTED_DAILY_CONFIRMED'
       )
+
       this.chartData.reportedDailyRecovered = this.generateGraph(
         this.timeseries.reportedDailies,
         'REPORTED_DAILY_RECOVERED'
       )
 
-      this.$toast.success('Loaded Country') 
+      this.chartData.reportedDailyDeaths = this.generateGraph(
+        this.timeseries.reportedDailies,
+        'REPORTED_DAILY_RECOVERED',
+        this.chartData.reportedDailyDeaths,
+        '#fbd5bd'
+      )
+
+      this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()
       console.groupEnd()
     },
 
-    generateGraph(data, field, chartData = null) {
+    generateGraph(data, field, chartData = null, borderColor = '#41B38A', fill = false) {
       console.log(data)
 
       const records = data.filter((x) => x.field == field)
@@ -145,10 +153,10 @@ export default {
       const values = records.map((x) => x.value)
 
       const newLine = {
-              label: field,
-              borderColor: '#41B38A',
-              fill: false,
-              data: values
+        label: field,
+        borderColor: borderColor,
+        fill: fill,
+        data: values
       }
 
       if (chartData == null) {

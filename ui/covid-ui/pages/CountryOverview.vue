@@ -36,34 +36,67 @@
       </v-row>
 
       <div id="graphs">
-        <v-row>
-          <h2>Reported Daily</h2>
-        </v-row>
-        <v-row>
-          <v-col cols="4">
-            <h3>Deaths</h3>
-            <LineChart
-              :data="chartData.reportedDaily.deaths"
-              :options="chartOptions"
-            />
-          </v-col>
+        <div id="reported_totals">
+          <v-row>
+            <h2>Reported Totals</h2>
+          </v-row>
+          <v-row>
+            <v-col cols="4">
+              <h3>Deaths</h3>
+              <LineChart
+                :data="chartData.reportedTotals.deaths"
+                :options="chartOptions"
+              />
+            </v-col>
 
-          <v-col cols="4">
-            <h3>Confirmed</h3>
-            <LineChart
-              :data="chartData.reportedDaily.confirmed"
-              :options="chartOptions"
-            />
-          </v-col>
+            <v-col cols="4">
+              <h3>Confirmed</h3>
+              <LineChart
+                :data="chartData.reportedTotals.confirmed"
+                :options="chartOptions"
+              />
+            </v-col>
 
-          <v-col cols="4">
-            <h3>Recovered</h3>
-            <LineChart
-              :data="chartData.reportedDaily.recovered"
-              :options="chartOptions"
-            />
-          </v-col>
-        </v-row>
+            <v-col cols="4">
+              <h3>Recovered</h3>
+              <LineChart
+                :data="chartData.reportedTotals.recovered"
+                :options="chartOptions"
+              />
+            </v-col>
+          </v-row>
+        </div>
+
+        <div id="reportedDailies">
+          <v-row>
+            <h2>Reported Daily</h2>
+          </v-row>
+          <v-row>
+            <v-col cols="4">
+              <h3>Deaths</h3>
+              <LineChart
+                :data="chartData.reportedDaily.deaths"
+                :options="chartOptions"
+              />
+            </v-col>
+
+            <v-col cols="4">
+              <h3>Confirmed</h3>
+              <LineChart
+                :data="chartData.reportedDaily.confirmed"
+                :options="chartOptions"
+              />
+            </v-col>
+
+            <v-col cols="4">
+              <h3>Recovered</h3>
+              <LineChart
+                :data="chartData.reportedDaily.recovered"
+                :options="chartOptions"
+              />
+            </v-col>
+          </v-row>
+        </div>
       </div>
     </v-flex>
   </v-layout>
@@ -100,6 +133,11 @@ export default {
           deaths: null,
           confirmed: null,
           recovered: null
+        },
+        reportedTotals: {
+          deaths: null,
+          confirmed: null,
+          recovered: null
         }
       },
       chartOptions: {
@@ -113,16 +151,56 @@ export default {
       this.$nuxt.$loading.start()
 
       const fields = [
-        this.$store.state.fields.fields.find(x => x.iD == 'REPORTED_DAILY_CONFIRMED'),
-        this.$store.state.fields.fields.find(x => x.iD == 'REPORTED_DAILY_DEATHS'),
-        this.$store.state.fields.fields.find(x => x.iD == 'REPORTED_DAILY_RECOVERED'),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'REPORTED_DAILY_CONFIRMED'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'REPORTED_DAILY_DEATHS'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'REPORTED_DAILY_RECOVERED'
+        ),
+
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'REPORTED_TOTAL_CONFIRMED'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'REPORTED_TOTAL_DEATHS'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'REPORTED_TOTAL_RECOVERED'
+        )
       ]
 
-      this.timeseries.reportedDailies = await this.loadData(fields.map(x => x.iD))
+      this.timeseries.reportedDailies = await this.loadData(
+        fields.map((x) => x.iD)
+      )
 
-      this.chartData.reportedDaily.confirmed = this.generateGraph(this.timeseries.reportedDailies, fields[0])
-      this.chartData.reportedDaily.deaths = this.generateGraph(this.timeseries.reportedDailies, fields[1])
-      this.chartData.reportedDaily.recovered = this.generateGraph(this.timeseries.reportedDailies, fields[2])
+      this.chartData.reportedDaily.confirmed = this.generateGraph(
+        this.timeseries.reportedDailies,
+        fields[0]
+      )
+      this.chartData.reportedDaily.deaths = this.generateGraph(
+        this.timeseries.reportedDailies,
+        fields[1]
+      )
+      this.chartData.reportedDaily.recovered = this.generateGraph(
+        this.timeseries.reportedDailies,
+        fields[2]
+      )
+
+      this.chartData.reportedTotals.confirmed = this.generateGraph(
+        this.timeseries.reportedDailies,
+        fields[3]
+      )
+      this.chartData.reportedTotals.deaths = this.generateGraph(
+        this.timeseries.reportedDailies,
+        fields[4]
+      )
+      this.chartData.reportedTotals.recovered = this.generateGraph(
+        this.timeseries.reportedDailies,
+        fields[5]
+      )
 
       this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()

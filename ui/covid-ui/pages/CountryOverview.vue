@@ -111,6 +111,8 @@ export default {
       console.group('Loading Reported Daily Data')
       this.$nuxt.$loading.start()
 
+      // TODO: Replace these mappings with state in vuex fields.js
+
       const fields = [
         'REPORTED_DAILY_CONFIRMED',
         'REPORTED_DAILY_DEATHS',

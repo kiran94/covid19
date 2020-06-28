@@ -43,7 +43,7 @@
           <v-col cols="4">
             <h3>Deaths</h3>
             <LineChart
-              :data="chartData.reportedDailyDeaths"
+              :data="chartData.reportedDaily.deaths"
               :options="chartOptions"
             />
           </v-col>
@@ -51,7 +51,7 @@
           <v-col cols="4">
             <h3>Confirmed</h3>
             <LineChart
-              :data="chartData.reportedDailyConfirmed"
+              :data="chartData.reportedDaily.confirmed"
               :options="chartOptions"
             />
           </v-col>
@@ -59,7 +59,7 @@
           <v-col cols="4">
             <h3>Recovered</h3>
             <LineChart
-              :data="chartData.reportedDailyRecovered"
+              :data="chartData.reportedDaily.recovered"
               :options="chartOptions"
             />
           </v-col>
@@ -96,10 +96,11 @@ export default {
         reportedDailies: null
       },
       chartData: {
-        reportedDailies: null,
-        reportedDailyDeaths: null,
-        reportedDailyConfirmed: null,
-        reportedDailyRecovered: null
+        reportedDaily: {
+          deaths: null,
+          confirmed: null,
+          recovered: null
+        }
       },
       chartOptions: {
         maintainAspectRatio: false
@@ -119,9 +120,9 @@ export default {
 
       this.timeseries.reportedDailies = await this.loadData(fields.map(x => x.iD))
 
-      this.chartData.reportedDailyConfirmed = this.generateGraph(this.timeseries.reportedDailies, fields[0])
-      this.chartData.reportedDailyDeaths = this.generateGraph(this.timeseries.reportedDailies, fields[1])
-      this.chartData.reportedDailyRecovered = this.generateGraph(this.timeseries.reportedDailies, fields[2])
+      this.chartData.reportedDaily.confirmed = this.generateGraph(this.timeseries.reportedDailies, fields[0])
+      this.chartData.reportedDaily.deaths = this.generateGraph(this.timeseries.reportedDailies, fields[1])
+      this.chartData.reportedDaily.recovered = this.generateGraph(this.timeseries.reportedDailies, fields[2])
 
       this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()

@@ -228,7 +228,18 @@ export default {
         ),
         this.$store.state.fields.fields.find(
           (x) => x.iD == 'ROLLING_AVERAGE_TWENTYONEDAY_CONFIRMED'
-        )
+        ),
+
+        // Average Recovered
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_SEVENDAY_RECOVERED'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_FOURTEENDAY_RECOVERED'
+        ),
+        this.$store.state.fields.fields.find(
+          (x) => x.iD == 'ROLLING_AVERAGE_TWENTYONEDAY_RECOVERED'
+        ),
       ]
 
       this.timeseries.reportedDailies = await this.loadData(
@@ -271,6 +282,12 @@ export default {
         this.timeseries.reportedDailies,
         [fields[9], fields[10], fields[11]],
         this.chartData.rollingAverages.confirmed
+      )
+
+      this.chartData.rollingAverages.recovered = this.generateGraphMultiple(
+        this.timeseries.reportedDailies,
+        [fields[12], fields[13], fields[14]],
+        this.chartData.rollingAverages.recovered
       )
 
       this.$toast.success('Loaded Country')

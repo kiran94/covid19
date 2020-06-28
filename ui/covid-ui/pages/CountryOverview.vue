@@ -35,7 +35,7 @@
         </v-col>
       </v-row>
 
-      <div id="graphs">
+      <div id="graphs" v-if="timeseries.reportedDailies">
         <div id="reported_totals">
           <v-row>
             <h2>Reported Totals</h2>

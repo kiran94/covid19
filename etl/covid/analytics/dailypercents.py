@@ -37,19 +37,19 @@ if __name__ == "__main__":
 
         computed: List[pd.DataFrame] = []
 
-        for index, grouped in grouped:
+        for index, group in grouped:
             logger.debug('Computing ' + str(index))
 
-            grouped.sort_values(by='date', inplace=True)
+            group.set_index('date', inplace=True)
+            group = group.asfreq('d')
 
-            # grouped['original_value'] = grouped['value']
+            previous = group['value'].shift(-1)
+            current = group['value']
 
-            previous = grouped['value'].shift(-1)
-            current = grouped['value']
+            group['value'] = (previous - current) / previous * 100
+            group.reset_index(inplace=True)
 
-            grouped['value'] = (previous - current) / previous * 100
-
-            computed.append(grouped)
+            computed.append(group)
 
         result = pd.concat(computed)
         result['field'] = target_field

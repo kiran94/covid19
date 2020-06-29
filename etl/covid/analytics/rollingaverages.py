@@ -48,9 +48,10 @@ if __name__ == "__main__":
         for index, group in grouped:
             logger.debug('Computing ' + str(index))
 
-            group.sort_values(by='date', inplace=True)
-
+            group.set_index('date', inplace=True)
+            group = group.asfreq('d')
             group['value'] = group['value'].rolling(rolling_map[args.frequency]).mean()
+            group.reset_index(inplace=True)
 
             computed.append(group)
 

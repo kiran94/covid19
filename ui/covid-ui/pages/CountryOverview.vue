@@ -29,6 +29,7 @@
             @click="loadReportedDaily"
             block
             class="mt-2"
+            :disabled="isLoading"
             ><v-icon>mdi-magnify</v-icon>Search</v-btn
           >
           <v-divider></v-divider>
@@ -150,6 +151,7 @@ export default {
   },
   data: function() {
     return {
+      isLoading: false,
       request: {
         selectedCountry: [],
         selectedDate: [],
@@ -183,6 +185,7 @@ export default {
   methods: {
     async loadReportedDaily() {
       console.group('Loading Reported Daily Data')
+      this.isLoading = true
       this.$nuxt.$loading.start()
 
       const fields = [
@@ -292,6 +295,7 @@ export default {
 
       this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()
+      this.isLoading = false
       console.groupEnd()
     },
 

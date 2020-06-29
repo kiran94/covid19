@@ -188,110 +188,70 @@ export default {
       this.isLoading = true
       this.$nuxt.$loading.start()
 
-      const fields = [
-        // Dailies
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'REPORTED_DAILY_CONFIRMED'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'REPORTED_DAILY_DEATHS'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'REPORTED_DAILY_RECOVERED'
-        ),
+      const fieldList = [
+        // Daily
+        { name: 'REPORTED_DAILY_CONFIRMED', chartCallback: chartData => this.chartData.reportedDaily.confirmed = chartData },
+        { name: 'REPORTED_DAILY_DEATHS', chartCallback: chartData => this.chartData.reportedDaily.deaths = chartData },
+        { name: 'REPORTED_DAILY_RECOVERED', chartCallback: chartData => this.chartData.reportedDaily.recovered = chartData },
 
-        // Totals
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'REPORTED_TOTAL_CONFIRMED'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'REPORTED_TOTAL_DEATHS'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'REPORTED_TOTAL_RECOVERED'
-        ),
+        // Daily Totals
+        { name: 'REPORTED_TOTAL_CONFIRMED', chartCallback: chartData => this.chartData.reportedTotals.confirmed = chartData },
+        { name: 'REPORTED_TOTAL_DEATHS', chartCallback: chartData => this.chartData.reportedTotals.deaths = chartData },
+        { name: 'REPORTED_TOTAL_RECOVERED', chartCallback: chartData => this.chartData.reportedTotals.recovered = chartData },
 
-        // Average Deaths
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_SEVENDAY_DEATHS'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_FOURTEENDAY_DEATHS'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_TWENTYONEDAY_DEATHS'
-        ),
-
-        // Averages Confirmed
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_SEVENDAY_CONFIRMED'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_FOURTEENDAY_CONFIRMED'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_TWENTYONEDAY_CONFIRMED'
-        ),
-
-        // Average Recovered
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_SEVENDAY_RECOVERED'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_FOURTEENDAY_RECOVERED'
-        ),
-        this.$store.state.fields.fields.find(
-          (x) => x.iD == 'ROLLING_AVERAGE_TWENTYONEDAY_RECOVERED'
-        ),
+        // Death Rolling Average
+        {
+          name: 'ROLLING_AVERAGE_DEATHS',
+          multiple: true,
+          subFields: ['ROLLING_AVERAGE_SEVENDAY_DEATHS', 'ROLLING_AVERAGE_FOURTEENDAY_DEATHS', 'ROLLING_AVERAGE_TWENTYONEDAY_DEATHS'],
+          chartCallback: chartData => this.chartData.rollingAverages.deaths = chartData
+        },
+        // Confirmed Rolling Average
+        {
+          name: 'ROLLING_AVERAGE_CONFIRMED',
+          multiple: true,
+          subFields: ['ROLLING_AVERAGE_SEVENDAY_CONFIRMED', 'ROLLING_AVERAGE_FOURTEENDAY_CONFIRMED', 'ROLLING_AVERAGE_TWENTYONEDAY_CONFIRMED'],
+          chartCallback: chartData => this.chartData.rollingAverages.confirmed = chartData
+        },
+        // Recovered Rolling Average
+        {
+          name: 'ROLLING_AVERAGE_RECOVERED',
+          multiple: true,
+          subFields: ['ROLLING_AVERAGE_SEVENDAY_RECOVERED', 'ROLLING_AVERAGE_FOURTEENDAY_RECOVERED', 'ROLLING_AVERAGE_TWENTYONEDAY_RECOVERED'],
+          chartCallback: chartData => this.chartData.rollingAverages.recovered = chartData
+        }
       ]
 
-      this.timeseries.reportedDailies = await this.loadData(
-        fields.map((x) => x.iD)
-      )
+      console.log('Finding Fields to pull')
+      let fields = []
+      fieldList.forEach(field => {
+        if (field.multiple) {
+          field.subFields.forEach(element => {
+            fields.push(this.$store.state.fields.fields.find(y => y.iD == element))
+          });
+        } else {
+          fields.push(this.$store.state.fields.fields.find(y => y.iD == field.name))
+        }
+      });
 
-      this.chartData.reportedDaily.confirmed = this.generateGraph(
-        this.timeseries.reportedDailies,
-        fields[0]
-      )
-      this.chartData.reportedDaily.deaths = this.generateGraph(
-        this.timeseries.reportedDailies,
-        fields[1]
-      )
-      this.chartData.reportedDaily.recovered = this.generateGraph(
-        this.timeseries.reportedDailies,
-        fields[2]
-      )
+      console.log('Requesting Timeseries Data')
+      this.timeseries.reportedDailies = await this.loadData(fields.map((x) => x.iD))
 
-      this.chartData.reportedTotals.confirmed = this.generateGraph(
-        this.timeseries.reportedDailies,
-        fields[3]
-      )
-      this.chartData.reportedTotals.deaths = this.generateGraph(
-        this.timeseries.reportedDailies,
-        fields[4]
-      )
-      this.chartData.reportedTotals.recovered = this.generateGraph(
-        this.timeseries.reportedDailies,
-        fields[5]
-      )
+      console.log('Generating Chart Data')
+      for (let field in fieldList) {
+        const currentField = fieldList[field]
 
-      this.chartData.rollingAverages.deaths = this.generateGraphMultiple(
-        this.timeseries.reportedDailies,
-        [fields[6], fields[7], fields[8]],
-        this.chartData.rollingAverages.deaths
-      )
+        let chartData = null
+        if (currentField.multiple) {
+          chartData = this.generateGraphMultiple(this.timeseries.reportedDailies, fields.filter(x => currentField.subFields.includes(x.iD)), null, false)
+        } else {
+          chartData = this.generateGraph(this.timeseries.reportedDailies, fields.filter(x => x.iD == currentField.name)[0], null, false)
+        }
 
-      this.chartData.rollingAverages.confirmed = this.generateGraphMultiple(
-        this.timeseries.reportedDailies,
-        [fields[9], fields[10], fields[11]],
-        this.chartData.rollingAverages.confirmed
-      )
-
-      this.chartData.rollingAverages.recovered = this.generateGraphMultiple(
-        this.timeseries.reportedDailies,
-        [fields[12], fields[13], fields[14]],
-        this.chartData.rollingAverages.recovered
-      )
+        if (currentField.chartCallback) {
+          currentField.chartCallback(chartData)
+        }
+      }
 
       this.$toast.success('Loaded Country')
       this.$nuxt.$loading.finish()

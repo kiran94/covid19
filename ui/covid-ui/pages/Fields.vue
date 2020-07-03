@@ -9,16 +9,15 @@
 
       <v-row align="center" justify="center">
         <v-col cols="12" md="8">
-          <v-data-table :headers="headers" :items="items" items-per-page="50" >
-
+          <v-data-table :headers="headers" :items="items" items-per-page="50">
             <template #item.color="{ item }">
               <span
                 :style="{ backgroundColor: item.color, color: 'white' }"
-                class="pa-1 rounded">
+                class="pa-1 rounded"
+              >
                 {{ item.color }}
               </span>
             </template>
-
           </v-data-table>
         </v-col>
       </v-row>
@@ -28,12 +27,7 @@
 
 <script>
 export default {
-  head() {
-    return {
-      title: 'Fields'
-    }
-  },
-  data: function() {
+  data() {
     return {
       headers: [
         { text: 'ID', value: 'iD', align: 'start' },
@@ -43,13 +37,16 @@ export default {
     }
   },
   computed: {
-    items: function() {
+    items() {
       return this.$store.state.fields.fields
+    }
+  },
+  head() {
+    return {
+      title: 'Fields'
     }
   }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

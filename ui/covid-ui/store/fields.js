@@ -20,6 +20,6 @@ export const actions = {
         `
     })
 
-    commit('setFields', data['data']['fields'])
+    commit('setFields', data.data.fields)
   }
 }

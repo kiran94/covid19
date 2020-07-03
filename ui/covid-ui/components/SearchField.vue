@@ -7,9 +7,9 @@
 
       <v-card-actions>
         <v-autocomplete
+          v-model="selectedField"
           :items="fields"
           item-text="iD"
-          v-model="selectedField"
           autocomplete="new"
           color="primary"
           chips
@@ -23,19 +23,20 @@
 
 <script>
 export default {
+  // eslint-disable-next-line vue/require-prop-types
   props: ['value'],
-  data: function() {
+  data() {
     return {
       selectedField: []
     }
   },
   computed: {
-    fields: function() {
+    fields() {
       return this.$store.state.fields.fields
     }
   },
   watch: {
-    selectedField: function(val) {
+    selectedField(val) {
       this.$emit('input', val)
     }
   }

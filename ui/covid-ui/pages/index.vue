@@ -9,14 +9,13 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { BarChart, LineChart } from '~/components/charts/charts.js'
 export default {
   components: {
     BarChart,
     LineChart
   },
-  data: function() {
+  data() {
     return {
       barChartData: {
         labels: ['Hello', 'World', 'Voltorb'],

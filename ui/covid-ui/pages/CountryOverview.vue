@@ -11,32 +11,32 @@
         <v-col cols="12" md="4">
           <SearchCountry
             v-model="request.selectedCountry"
-            hideState
-            hideCounty
-            hideTitle
-            hideSubtitle
+            hide-state
+            hide-county
+            hide-title
+            hide-subtitle
           ></SearchCountry>
 
           <SearchDate
             v-if="false"
             v-model="request.selectedDate"
-            hideTitle
+            hide-title
           ></SearchDate>
 
           <v-btn
             depressed
             color="primary"
-            @click="loadReportedDaily"
             block
             class="mt-2"
             :disabled="isLoading"
+            @click="loadReportedDaily"
             ><v-icon>mdi-magnify</v-icon>Search</v-btn
           >
           <v-divider></v-divider>
         </v-col>
       </v-row>
 
-      <div id="graphs" v-if="timeseries.reportedDailies">
+      <div v-if="timeseries.reportedDailies" id="graphs">
         <div id="reported_totals">
           <v-row>
             <h2>Reported Totals</h2>
@@ -144,12 +144,7 @@ export default {
     SearchDate,
     LineChart
   },
-  head() {
-    return {
-      title: 'CountryOverview'
-    }
-  },
-  data: function() {
+  data() {
     return {
       isLoading: false,
       request: {
@@ -190,62 +185,117 @@ export default {
 
       const fieldList = [
         // Daily
-        { name: 'REPORTED_DAILY_CONFIRMED', chartCallback: chartData => this.chartData.reportedDaily.confirmed = chartData },
-        { name: 'REPORTED_DAILY_DEATHS', chartCallback: chartData => this.chartData.reportedDaily.deaths = chartData },
-        { name: 'REPORTED_DAILY_RECOVERED', chartCallback: chartData => this.chartData.reportedDaily.recovered = chartData },
+        {
+          name: 'REPORTED_DAILY_CONFIRMED',
+          chartCallback: (chartData) =>
+            (this.chartData.reportedDaily.confirmed = chartData)
+        },
+        {
+          name: 'REPORTED_DAILY_DEATHS',
+          chartCallback: (chartData) =>
+            (this.chartData.reportedDaily.deaths = chartData)
+        },
+        {
+          name: 'REPORTED_DAILY_RECOVERED',
+          chartCallback: (chartData) =>
+            (this.chartData.reportedDaily.recovered = chartData)
+        },
 
         // Daily Totals
-        { name: 'REPORTED_TOTAL_CONFIRMED', chartCallback: chartData => this.chartData.reportedTotals.confirmed = chartData },
-        { name: 'REPORTED_TOTAL_DEATHS', chartCallback: chartData => this.chartData.reportedTotals.deaths = chartData },
-        { name: 'REPORTED_TOTAL_RECOVERED', chartCallback: chartData => this.chartData.reportedTotals.recovered = chartData },
+        {
+          name: 'REPORTED_TOTAL_CONFIRMED',
+          chartCallback: (chartData) =>
+            (this.chartData.reportedTotals.confirmed = chartData)
+        },
+        {
+          name: 'REPORTED_TOTAL_DEATHS',
+          chartCallback: (chartData) =>
+            (this.chartData.reportedTotals.deaths = chartData)
+        },
+        {
+          name: 'REPORTED_TOTAL_RECOVERED',
+          chartCallback: (chartData) =>
+            (this.chartData.reportedTotals.recovered = chartData)
+        },
 
         // Death Rolling Average
         {
           name: 'ROLLING_AVERAGE_DEATHS',
           multiple: true,
-          subFields: ['ROLLING_AVERAGE_SEVENDAY_DEATHS', 'ROLLING_AVERAGE_FOURTEENDAY_DEATHS', 'ROLLING_AVERAGE_TWENTYONEDAY_DEATHS'],
-          chartCallback: chartData => this.chartData.rollingAverages.deaths = chartData
+          subFields: [
+            'ROLLING_AVERAGE_SEVENDAY_DEATHS',
+            'ROLLING_AVERAGE_FOURTEENDAY_DEATHS',
+            'ROLLING_AVERAGE_TWENTYONEDAY_DEATHS'
+          ],
+          chartCallback: (chartData) =>
+            (this.chartData.rollingAverages.deaths = chartData)
         },
         // Confirmed Rolling Average
         {
           name: 'ROLLING_AVERAGE_CONFIRMED',
           multiple: true,
-          subFields: ['ROLLING_AVERAGE_SEVENDAY_CONFIRMED', 'ROLLING_AVERAGE_FOURTEENDAY_CONFIRMED', 'ROLLING_AVERAGE_TWENTYONEDAY_CONFIRMED'],
-          chartCallback: chartData => this.chartData.rollingAverages.confirmed = chartData
+          subFields: [
+            'ROLLING_AVERAGE_SEVENDAY_CONFIRMED',
+            'ROLLING_AVERAGE_FOURTEENDAY_CONFIRMED',
+            'ROLLING_AVERAGE_TWENTYONEDAY_CONFIRMED'
+          ],
+          chartCallback: (chartData) =>
+            (this.chartData.rollingAverages.confirmed = chartData)
         },
         // Recovered Rolling Average
         {
           name: 'ROLLING_AVERAGE_RECOVERED',
           multiple: true,
-          subFields: ['ROLLING_AVERAGE_SEVENDAY_RECOVERED', 'ROLLING_AVERAGE_FOURTEENDAY_RECOVERED', 'ROLLING_AVERAGE_TWENTYONEDAY_RECOVERED'],
-          chartCallback: chartData => this.chartData.rollingAverages.recovered = chartData
+          subFields: [
+            'ROLLING_AVERAGE_SEVENDAY_RECOVERED',
+            'ROLLING_AVERAGE_FOURTEENDAY_RECOVERED',
+            'ROLLING_AVERAGE_TWENTYONEDAY_RECOVERED'
+          ],
+          chartCallback: (chartData) =>
+            (this.chartData.rollingAverages.recovered = chartData)
         }
       ]
 
       console.log('Finding Fields to pull')
-      let fields = []
-      fieldList.forEach(field => {
+      const fields = []
+      fieldList.forEach((field) => {
         if (field.multiple) {
-          field.subFields.forEach(element => {
-            fields.push(this.$store.state.fields.fields.find(y => y.iD == element))
-          });
+          field.subFields.forEach((element) => {
+            fields.push(
+              this.$store.state.fields.fields.find((y) => y.iD === element)
+            )
+          })
         } else {
-          fields.push(this.$store.state.fields.fields.find(y => y.iD == field.name))
+          fields.push(
+            this.$store.state.fields.fields.find((y) => y.iD === field.name)
+          )
         }
-      });
+      })
 
       console.log('Requesting Timeseries Data')
-      this.timeseries.reportedDailies = await this.loadData(fields.map((x) => x.iD))
+      this.timeseries.reportedDailies = await this.loadData(
+        fields.map((x) => x.iD)
+      )
 
       console.log('Generating Chart Data')
-      for (let field in fieldList) {
+      for (const field in fieldList) {
         const currentField = fieldList[field]
 
         let chartData = null
         if (currentField.multiple) {
-          chartData = this.generateGraphMultiple(this.timeseries.reportedDailies, fields.filter(x => currentField.subFields.includes(x.iD)), null, false)
+          chartData = this.generateGraphMultiple(
+            this.timeseries.reportedDailies,
+            fields.filter((x) => currentField.subFields.includes(x.iD)),
+            null,
+            false
+          )
         } else {
-          chartData = this.generateGraph(this.timeseries.reportedDailies, fields.filter(x => x.iD == currentField.name)[0], null, false)
+          chartData = this.generateGraph(
+            this.timeseries.reportedDailies,
+            fields.filter((x) => x.iD === currentField.name)[0],
+            null,
+            false
+          )
         }
 
         if (currentField.chartCallback) {
@@ -260,14 +310,14 @@ export default {
     },
 
     generateGraph(data, fieldInfo, chartData = null, fill = false) {
-      const records = data.filter((x) => x.field == fieldInfo.iD)
+      const records = data.filter((x) => x.field === fieldInfo.iD)
       const dates = records.map((x) => x.date)
       const values = records.map((x) => x.value)
 
       const newLine = {
         label: fieldInfo.description,
         borderColor: fieldInfo.color,
-        fill: fill,
+        fill,
         data: values
       }
 
@@ -282,7 +332,7 @@ export default {
 
     generateGraphMultiple(data, fieldInfos, chartData = null, fill = false) {
       for (let i = 0; i < fieldInfos.length; i++) {
-        if (i == 0) {
+        if (i === 0) {
           chartData = this.generateGraph(data, fieldInfos[i], null, fill)
         } else {
           chartData = this.generateGraph(data, fieldInfos[i], chartData, fill)
@@ -324,7 +374,7 @@ export default {
           country_region: this.request.selectedCountry[0],
           province_state: '',
           counties: '',
-          fields: fields,
+          fields,
           take: this.request.take,
           chronological: true
         }
@@ -332,7 +382,12 @@ export default {
 
       console.log(result)
       console.groupEnd()
-      return result['data']['timeseries']
+      return result.data.timeseries
+    }
+  },
+  head() {
+    return {
+      title: 'CountryOverview'
     }
   }
 }

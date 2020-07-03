@@ -1,16 +1,16 @@
 <template>
   <div class="search_country">
     <v-card>
-      <v-card-title class="headline" v-if="!hideTitle">
+      <v-card-title v-if="!hideTitle" class="headline">
         Search Country
       </v-card-title>
 
       <v-card-actions v-if="!hideCountry">
         <v-card-subtitle v-if="!hideSubtitle">Country</v-card-subtitle>
         <v-autocomplete
+          v-model="selectedCountry"
           :items="countries"
           item-text="countryRegion"
-          v-model="selectedCountry"
           autocomplete="new"
         />
       </v-card-actions>
@@ -18,9 +18,9 @@
       <v-card-actions v-if="!hideState">
         <v-card-subtitle v-if="!hideSubtitle">States</v-card-subtitle>
         <v-autocomplete
+          v-model="selectedState"
           :items="states"
           item-text="provinceState"
-          v-model="selectedState"
           autocomplete="new"
         />
       </v-card-actions>
@@ -28,9 +28,9 @@
       <v-card-actions v-if="!hideCounty">
         <v-card-subtitle v-if="!hideSubtitle">County</v-card-subtitle>
         <v-autocomplete
+          v-model="selectedCounty"
           :items="counties"
           item-text="county"
-          v-model="selectedCounty"
           autocomplete="new"
         />
       </v-card-actions>
@@ -41,6 +41,7 @@
 <script>
 export default {
   props: {
+    // eslint-disable-next-line vue/require-default-prop
     value: Array,
     hideCountry: Boolean,
     hideState: Boolean,
@@ -48,7 +49,7 @@ export default {
     hideTitle: Boolean,
     hideSubtitle: Boolean
   },
-  data: function() {
+  data() {
     return {
       selectedCountry: null,
       selectedState: null,
@@ -56,38 +57,38 @@ export default {
     }
   },
   computed: {
-    countries: function() {
+    countries() {
       return this.$store.state.country.countries
     },
-    states: function() {
+    states() {
       return this.countries.filter(
-        (x) => x.countryRegion == this.selectedCountry
+        (x) => x.countryRegion === this.selectedCountry
       )
     },
-    counties: function() {
+    counties() {
       return this.countries.filter(
         (x) =>
-          x.countryRegion == this.selectedCountry &&
-          x.provinceState == this.selectedState
+          x.countryRegion === this.selectedCountry &&
+          x.provinceState === this.selectedState
       )
     }
   },
   watch: {
-    selectedCountry: function(val) {
+    selectedCountry() {
       this.$emit('input', [
         this.selectedCountry,
         this.selectedState,
         this.selectedCounty
       ])
     },
-    selectedState: function(val) {
+    selectedState() {
       this.$emit('input', [
         this.selectedCountry,
         this.selectedState,
         this.selectedCounty
       ])
     },
-    selectedCounty: function(val) {
+    selectedCounty() {
       this.$emit('input', [
         this.selectedCountry,
         this.selectedState,

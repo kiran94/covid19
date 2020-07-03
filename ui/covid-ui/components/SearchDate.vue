@@ -1,7 +1,7 @@
 <template>
   <div id="search_date">
     <v-card tile>
-      <v-card-title class="headline" v-if="!hideTitle">
+      <v-card-title v-if="!hideTitle" class="headline">
         Select Dates
       </v-card-title>
 
@@ -21,16 +21,17 @@
 <script>
 export default {
   props: {
+    // eslint-disable-next-line vue/require-default-prop
     value: Array,
     hideTitle: Boolean
   },
-  data: function() {
+  data() {
     return {
       selectedDateRange: []
     }
   },
   watch: {
-    selectedDateRange: function(val) {
+    selectedDateRange(val) {
       this.$emit('input', val)
     }
   }

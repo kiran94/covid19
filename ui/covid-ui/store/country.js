@@ -20,7 +20,7 @@ export const actions = {
     `
     })
 
-    commit('setCountries', data['data']['countries'])
+    commit('setCountries', data.data.countries)
   }
 }
 

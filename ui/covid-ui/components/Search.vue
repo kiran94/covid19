@@ -14,7 +14,7 @@
       </v-list-tile>
 
       <v-list-tile>
-        <v-btn depressed color="primary" @click="search" block class="mt-2"
+        <v-btn depressed color="primary" block class="mt-2" @click="search"
           ><v-icon>mdi-magnify</v-icon>Search</v-btn
         >
       </v-list-tile>

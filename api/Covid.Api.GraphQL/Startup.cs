@@ -20,6 +20,7 @@ namespace Covid.Api.GraphQL
     using Serilog;
     using CorrelationId.DependencyInjection;
     using CorrelationId;
+    using Covid.Api.Common.Services.Field;
 
     public class Startup
     {
@@ -71,6 +72,17 @@ namespace Covid.Api.GraphQL
                 options.ExposeExceptions = true;
             }).AddGraphTypes();
 
+            // CORS
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin();
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyMethod();
+                });
+            });
+
             // OPENTRACING
             services.AddSingleton<ITracer>(provider =>
             {
@@ -86,6 +98,9 @@ namespace Covid.Api.GraphQL
 
                 return tracer;
             });
+
+            // DOMAIN SERVICES
+            services.AddSingleton<IFieldService, FieldService>();
 
             services.AddOpenTracing();
             services.AddControllers();
@@ -103,6 +118,7 @@ namespace Covid.Api.GraphQL
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors();
 
             app.UseGraphQL<AppSchema>();
             app.UseGraphQLPlayground(options: new GraphQLPlaygroundOptions());

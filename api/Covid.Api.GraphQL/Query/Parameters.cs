@@ -13,6 +13,7 @@ namespace Covid.Api.GraphQL.Query
         public const string Dates = "dates";
         public const string Take = "take";
         public const string Skip = "skip";
+        public const string Chronological  = "chronological";
 
         /// <summary>
         /// Maps Parameters to Descriptions
@@ -25,6 +26,7 @@ namespace Covid.Api.GraphQL.Query
             [Counties] = "The Counties to Filter on",
             [Fields] = "The Field to Filter on",
             [Dates] = "The Date to Filter on",
+            [Chronological] = "Order Events in chronological order",
             [Take] = "(Pagination) only take specified number of results",
             [Skip] = "(Pagination) skip the specified number of results"
         };

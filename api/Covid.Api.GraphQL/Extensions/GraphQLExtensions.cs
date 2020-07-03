@@ -24,6 +24,8 @@ namespace Covid.Api.GraphQL.Extensions
 
         public static ISpan WithGraphQLTags(this ISpan span, ResolveFieldContext<object> context)
         {
+            if (context.Arguments == null || context.Arguments.Count == 0) return span;
+
             foreach (var argument in context.Arguments)
             {
                 if (argument.Value is List<object> list)

@@ -1,0 +1,58 @@
+{
+  "name": "covid-ui",
+  "version": "1.0.0",
+  "description": "My delightful Nuxt.js project",
+  "author": "Kiran94",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "lint_no_fix": "eslint --ext .js,.vue .",
+    "lint": "eslint --ext .js,.vue --fix .",
+    "test": "jest"
+  },
+  "lint-staged": {
+    "*.{js,vue}": "npm run lint",
+    "*.{css,vue}": "stylelint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/dotenv": "^1.4.0",
+    "chart.js": "^2.9.3",
+    "nuxt": "^2.0.0",
+    "nuxt-vue-select": "^0.1.4",
+    "nuxt-vuex-localstorage": "^1.2.6",
+    "vue-chartjs": "^3.5.0",
+    "vue-toastification": "^1.7.6",
+    "vuex-persist": "^2.2.0"
+  },
+  "devDependencies": {
+    "@nuxt/typescript-build": "^0.6.0",
+    "@nuxtjs/eslint-config-typescript": "^1.0.0",
+    "@nuxtjs/eslint-module": "^1.0.0",
+    "@nuxtjs/stylelint-module": "^3.1.0",
+    "@nuxtjs/vuetify": "^1.0.0",
+    "@types/chart.js": "^2.9.22",
+    "@vue/test-utils": "^1.0.0-beta.27",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.1.0",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-nuxt": ">=0.4.2",
+    "eslint-plugin-prettier": "^3.1.2",
+    "husky": "^4.0.0",
+    "jest": "^24.1.0",
+    "lint-staged": "^10.0.0",
+    "prettier": "^1.19.1",
+    "stylelint": "^10.1.0",
+    "ts-jest": "^25.0.0",
+    "vue-jest": "^4.0.0-0"
+  }
+}

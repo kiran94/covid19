@@ -9,12 +9,12 @@
       }}</v-toolbar-title>
       <v-spacer />
         <template v-slot:extension>
-          <v-tabs align-with-title class="mt-2">
-            <v-tab to="/" nuxt>Home</v-tab>
-            <v-tab to="/CountryOverview" nuxt>Country Overview</v-tab>
-            <v-tab to="/GlobalOverview" nuxt>Global Overview</v-tab>
-            <v-tab><v-badge content="beta">Country Comparison</v-badge></v-tab>
-            <v-tab to="/Fields" nuxt>Fields</v-tab>
+          <v-tabs align-with-title class="mt-2 secondary">
+            <v-tab class="white--text" to="/" nuxt>Home</v-tab>
+            <v-tab class="white--text" to="/GlobalOverview" nuxt>Global Overview</v-tab>
+            <v-tab class="white--text" to="/CountryOverview" nuxt>Country Overview</v-tab>
+            <v-tab class="white--text" to="/CountryComparison" nuxt>Country Comparison</v-tab>
+            <v-tab class="white--text" to="/Fields" nuxt>Fields</v-tab>
           </v-tabs>
         </template>
     </v-app-bar>

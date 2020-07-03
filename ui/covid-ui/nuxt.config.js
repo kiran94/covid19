@@ -78,8 +78,8 @@ export default {
       dark: false,
       themes: {
         light: {
-          primary: colors.deepOrange.darken2,
-          secondary: colors.grey.darken1,
+          primary: colors.deepOrange.darken1,
+          secondary: colors.amber.darken2,
           accent: colors.shades.black,
           error: colors.red.accent3
         },

@@ -12,7 +12,7 @@ from covid.analytics.common import run
 
 logger = logging.getLogger('covid.analytics.dailytotals')
 
-def logic(frame: pd.DataFrame, target_field: str):
+def logic(frame: pd.DataFrame, target_field: str, **kwargs):
     '''
     Computes the Daily Totals for the incoming DataFrame.
     '''

@@ -30,6 +30,7 @@ def run(
         target_table_name(str): The name of the table to write data back to
         console(bool): Print the computed data to console
         publish(bool): Publish the data back to the target table
+        Remaining kwargs are passed directly into logic
     '''
     logger.info('Computing %s -> %s', source_field, target_field)
 
@@ -51,7 +52,7 @@ def run(
 
     logger.info('Applying Logic on %s datapoints', frame.shape[0])
 
-    result: pd.DataFrame = logic(frame, target_field)
+    result: pd.DataFrame = logic(frame, target_field, **kwargs)
 
     if console:
         print(result)

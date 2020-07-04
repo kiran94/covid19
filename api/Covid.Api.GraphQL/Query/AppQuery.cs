@@ -68,7 +68,9 @@ namespace Covid.Api.GraphQL.Query
                     Parameters.Argument<ListGraphType<DateTimeGraphType>>(Parameters.Dates),
                     Parameters.Argument<IntGraphType>(Parameters.Take),
                     Parameters.Argument<IntGraphType>(Parameters.Skip),
-                    Parameters.Argument<BooleanGraphType>(Parameters.Chronological)
+                    Parameters.Argument<BooleanGraphType>(Parameters.Chronological),
+                    Parameters.Argument<BooleanGraphType>(Parameters.OrderByValueAscending),
+                    Parameters.Argument<BooleanGraphType>(Parameters.OrderByValueDescending)
                 },
                 resolve: async context =>
                 {
@@ -82,6 +84,14 @@ namespace Covid.Api.GraphQL.Query
                     if (context.TryGetArgument<bool>(Parameters.Chronological, out var chronological) && chronological)
                     {
                         timeseries = timeseries.OrderBy(x => x.Date);
+                    }
+                    else if (context.TryGetArgument<bool>(Parameters.OrderByValueAscending, out var orderByValueAsc) && orderByValueAsc)
+                    {
+                        timeseries = timeseries.OrderBy(x => x.Value);
+                    }
+                    else if (context.TryGetArgument<bool>(Parameters.OrderByValueDescending, out var orderByValueDesc) && orderByValueDesc)
+                    {
+                        timeseries = timeseries.OrderByDescending(x => x.Value);
                     }
                     else
                     {

@@ -14,6 +14,8 @@ namespace Covid.Api.GraphQL.Query
         public const string Take = "take";
         public const string Skip = "skip";
         public const string Chronological  = "chronological";
+        public const string OrderByValueAscending = "order_value_ascending";
+        public const string OrderByValueDescending = "order_value_descending";
 
         /// <summary>
         /// Maps Parameters to Descriptions
@@ -27,6 +29,8 @@ namespace Covid.Api.GraphQL.Query
             [Fields] = "The Field to Filter on",
             [Dates] = "The Date to Filter on",
             [Chronological] = "Order Events in chronological order",
+            [OrderByValueAscending] = "Order by Value (ASC)",
+            [OrderByValueDescending] = "Order by Value (DESC)",
             [Take] = "(Pagination) only take specified number of results",
             [Skip] = "(Pagination) skip the specified number of results"
         };

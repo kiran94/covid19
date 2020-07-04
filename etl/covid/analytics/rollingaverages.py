@@ -7,6 +7,7 @@ import sqlalchemy
 from typing import List
 from covid.core.tracing import tracer, trace_command_line_arguments
 from covid.core import COUNTRY_INDEX
+from covid.analytics.common import run
 
 logger = logging.getLogger('covid.analytics.rollingaverages')
 
@@ -15,6 +16,34 @@ rolling_map = {
     'FOURTEENDAY': 14,
     'TWENTYONEDAY': 21
 }
+
+
+def logic(frame: pd.DataFrame, target_field: str, **kwargs):
+    '''
+    Computes the Rolling Averages for the incoming DataFrame.
+    '''
+    grouped = frame.groupby(by=COUNTRY_INDEX)
+
+    rolling_number = rolling_map[kwargs.get('frequency')]
+    logger.info('Rolling by %s', rolling_number)
+
+    computed: List[pd.DataFrame] = []
+
+    for index, group in grouped:
+        logger.debug('Computing ' + str(index))
+
+        group.set_index('date', inplace=True)
+        group = group.sort_index().asfreq('d')
+
+        group['value'] = group['value'].rolling(rolling_number).mean()
+        group.reset_index(inplace=True)
+
+        computed.append(group)
+
+    result = pd.concat(computed)
+    result['field'] = target_field
+    return result
+
 
 if __name__ == "__main__":
 
@@ -36,37 +65,6 @@ if __name__ == "__main__":
 
         logger.info(f'Computing {args.frequency} Averages for {field} -> {target_field}')
 
-        engine = sqlalchemy.create_engine(DATABASE_CONNECTION_STRING)
-        frame: pd.DataFrame = pd.read_sql(f'select * from public.timeseries where field = \'{field}\'', con=engine)
-
-        logger.info(f'Loaded {frame.shape[0]} rows')
-
-        grouped = frame.groupby(by=COUNTRY_INDEX)
-
-        computed: List[pd.DataFrame] = []
-
-        for index, group in grouped:
-            logger.debug('Computing ' + str(index))
-
-            group.set_index('date', inplace=True)
-            group = group.asfreq('d')
-            group['value'] = group['value'].rolling(rolling_map[args.frequency]).mean()
-            group.reset_index(inplace=True)
-
-            computed.append(group)
-
-        result = pd.concat(computed)
-        result['field'] = target_field
-
-        if args.console:
-            print(result)
-            print(result.dtypes)
-
-        if args.publish:
-            logger.info(f'Writing {result.shape[0]} rows to datastore')
-
-            with engine.begin() as connection:
-                connection.execute("DELETE FROM public.timeseries WHERE field = '" + target_field + "'")
-                result.to_sql('timeseries', con=connection, if_exists='append', index=False)
+        run(field, target_field, logic, frequency=args.frequency, console=args.console, publish=args.publish)
 
     tracer.close()

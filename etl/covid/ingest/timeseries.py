@@ -75,6 +75,19 @@ if __name__ == "__main__":
             # pivoted['is_updated'] = True # should be used when switching to incremental loads
             # pivoted['updated_at'] = datetime.utcnow()
 
+            logger.info('Computing Earth Datapoints')
+            only_countries: pd.DataFrame = pivoted.loc[(pivoted['province_state'] == '') & (pivoted['county'] == '')]
+            earth_sums = only_countries.groupby('date').sum()
+            earth_sums.reset_index(inplace=True)
+
+            earth_sums['country_region'] = 'Earth'
+            earth_sums['province_state'] = ''
+            earth_sums['county'] = ''
+            earth_sums['field'] = reported_totals_map.get(args.source)
+
+            logger.info('Appending %s Earth Totals', earth_sums.shape[0])
+            pivoted = pd.concat([pivoted, earth_sums])
+
             if args.console:
                 print(pivoted)
 

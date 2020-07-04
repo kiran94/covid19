@@ -28,6 +28,7 @@ def run(
         source_table_name(str): The name of the table to pull data from
         target_table_schema(str): The schema of the table to write data back to
         target_table_name(str): The name of the table to write data back to
+        load_country(bool): Additionally load country information and pass into logic in kwargs (countries)
         console(bool): Print the computed data to console
         publish(bool): Publish the data back to the target table
         Remaining kwargs are passed directly into logic
@@ -41,6 +42,7 @@ def run(
     target_table_name = kwargs.get("target_table_name", "timeseries")
     source_table = f'{source_table_schema}.{source_table_name}'
     target_table = f'{target_table_schema}.{target_table_name}'
+    load_country = kwargs.get('load_country', False)
     console = kwargs.get('console', False)
     publish = kwargs.get('publish', False)
 
@@ -49,6 +51,11 @@ def run(
 
     logger.info('Retrieving Data from %s', source_table)
     frame: pd.DataFrame = pd.read_sql(f'SELECT * FROM {source_table} WHERE field = \'{source_field}\'', con=engine)
+
+    if load_country:
+        logger.info('Loading Country Information')
+        countries: pd.DataFrame = pd.read_sql('select * from public.country', con=engine)
+        kwargs['countries'] = countries
 
     logger.info('Applying Logic on %s datapoints', frame.shape[0])
 

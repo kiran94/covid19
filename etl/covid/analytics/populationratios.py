@@ -6,8 +6,31 @@ import pandas as pd
 import sqlalchemy
 from covid.core.tracing import tracer, trace_command_line_arguments
 from covid.core import COUNTRY_INDEX
+from covid.analytics.common import run
 
 logger = logging.getLogger('covid.analytics.populationratios')
+
+
+def logic(frame: pd.DataFrame, target_field: str, **kwargs):
+    '''
+    Computes the Rolling Averages for the incoming DataFrame.
+    '''
+    timeseries = frame
+    countries = kwargs.get('countries')
+
+    countries = countries[['country_region', 'province_state', 'county', 'population']]
+
+    logger.info('Stitching Population to Timeseries')
+    timeseries = timeseries.merge(countries, how='inner', on=COUNTRY_INDEX)
+
+    logger.info(f'Computing {args.source} / Population Ratio')
+
+    timeseries['field'] = target_field
+    timeseries['value'] = timeseries['value'] / timeseries['population']
+
+    timeseries.drop(columns='population', inplace=True)
+    return timeseries
+
 
 if __name__ == "__main__":
 
@@ -26,35 +49,6 @@ if __name__ == "__main__":
         span.set_tag('source_field', source_field)
         span.set_tag('target_field', target_field)
 
-        logger.info(f'Computing Population Ratios for {source_field} -> {target_field}')
-
-        engine = sqlalchemy.create_engine(DATABASE_CONNECTION_STRING)
-
-        logger.info('Getting Timeseries and Country Information')
-        timeseries = pd.read_sql(f'select * from public.timeseries where field = \'{source_field}\'', con=engine)
-        countries = pd.read_sql('select * from public.country', con=engine)
-
-        countries = countries[['country_region', 'province_state', 'county', 'population']]
-
-        logger.info('Stitching Population to Timeseries')
-        timeseries = timeseries.merge(countries, how='inner', on=COUNTRY_INDEX)
-
-        logger.info(f'Computing {args.source} / Population Ratio')
-
-        timeseries['field'] = target_field
-        timeseries['value'] = timeseries['value'] / timeseries['population']
-
-        timeseries.drop(columns='population', inplace=True)
-
-        if args.console:
-            print(timeseries)
-            print(timeseries.dtypes)
-
-        if args.publish:
-            logger.info(f'Writing {timeseries.shape[0]} rows to datastore')
-
-            with engine.begin() as connection:
-                connection.execute("DELETE FROM public.timeseries WHERE field = '" + target_field + "'")
-                timeseries.to_sql('timeseries', con=connection, if_exists='append', index=False)
+        run(source_field, target_field, logic, load_country=True, console=args.console, publish=args.publish)
 
     tracer.close()

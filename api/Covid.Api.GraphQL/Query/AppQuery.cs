@@ -15,7 +15,7 @@ namespace Covid.Api.GraphQL.Query
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(ApiContext sql, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields)
+        public AppQuery(IRepository sql, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields)
         {
             #region countries
             this.FieldAsync<ListGraphType<CountryType>>(
@@ -33,7 +33,7 @@ namespace Covid.Api.GraphQL.Query
 
                     logger.LogInformation("Getting Country Information");
 
-                    var countries = sql.Set<Country>()
+                    var countries = sql.Query<Country>()
                         .OrderBy(x => x.CountryRegion)
                         .ThenBy(x => x.ProvinceState)
                         .AsQueryable();
@@ -79,7 +79,7 @@ namespace Covid.Api.GraphQL.Query
                     logger.LogInformation("Getting TimeSeries Information");
                     using var _ = logger.BeginScope(context.Arguments);
 
-                    var timeseries = sql.Set<TimeSeries>().AsQueryable();
+                    var timeseries = sql.Query<TimeSeries>();
 
                     if (context.TryGetArgument<bool>(Parameters.Chronological, out var chronological) && chronological)
                     {

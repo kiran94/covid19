@@ -101,6 +101,7 @@ namespace Covid.Api.GraphQL
 
             // DOMAIN SERVICES
             services.AddSingleton<IFieldService, FieldService>();
+            services.AddScoped<IRepository>(x => x.GetService<ApiContext>());
 
             services.AddOpenTracing();
             services.AddControllers();

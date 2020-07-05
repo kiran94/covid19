@@ -8,3 +8,4 @@ opentracing
 jaeger-client
 opentracing_instrumentation
 tornado==5
+python-restcountries>=0.2

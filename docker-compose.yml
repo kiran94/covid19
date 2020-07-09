@@ -66,6 +66,7 @@ services:
       - elasticsearch
       - kibana
       - jaeger
+      - country_database
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       POSTGRES_HOST: etl_database
@@ -87,6 +88,8 @@ services:
       - 27017:27017
     volumes:
       - country_database:/data/db
+    networks:
+      - database
 
 volumes:
   etl_database:

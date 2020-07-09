@@ -1,5 +1,10 @@
+using Covid.Api.Common.DataAccess.Attribute;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace Covid.Api.Common.Entities
 {
+    [MongoCollection("countries")]
+    [BsonIgnoreExtraElements]
     public class Country
     {
         public string CountryRegion { get; set; }

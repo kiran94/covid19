@@ -23,11 +23,14 @@ namespace Covid.Api.GraphQL
     using Covid.Api.Common.Services.Field;
     using MongoDB.Driver;
     using MongoDB.Bson.Serialization.Conventions;
+    using MongoDB.Driver.Core.Events;
+    using MongoDB.Bson;
 
     public class Startup
     {
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Environment { get; }
+        private static string ApplicationName = Assembly.GetEntryAssembly().GetName().Name;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -107,7 +110,23 @@ namespace Covid.Api.GraphQL
 
             // MONGO
             services.AddScoped<IMongoDatabase>(x => {
-                var client = new MongoClient(this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"));
+
+                var logger = x.GetRequiredService<ILogger<IMongoDatabase>>();
+                var settings = MongoClientSettings.FromConnectionString(this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"));
+                settings.ApplicationName = ApplicationName;
+
+                settings.ClusterConfigurator = cb =>
+                {
+                    cb.Subscribe<CommandStartedEvent>(e =>
+                    {
+                        if (logger.IsEnabled(LogLevel.Information))
+                        {
+                            logger.LogInformation("Mongo Query {0} Running {1}", e.CommandName, e.Command.ToJson());
+                        }
+                    });
+                };
+
+                var client = new MongoClient(settings);
                 return client.GetDatabase(this.Configuration.GetValue<string>("CountryDatabase:Database"));
             });
 

@@ -63,6 +63,8 @@ if __name__ == "__main__":
 
             frame['ProvinceState'].fillna(value='', inplace=True)
             frame['County'].fillna(value='', inplace=True)
+            frame['iso2'].fillna(value='', inplace=True)
+            frame['iso3'].fillna(value='', inplace=True)
             frame.columns = list(map(snakecase.convert, frame.columns))
 
             if frame.empty:

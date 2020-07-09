@@ -21,6 +21,8 @@ namespace Covid.Api.GraphQL
     using CorrelationId.DependencyInjection;
     using CorrelationId;
     using Covid.Api.Common.Services.Field;
+    using MongoDB.Driver;
+    using MongoDB.Bson.Serialization.Conventions;
 
     public class Startup
     {
@@ -63,6 +65,8 @@ namespace Covid.Api.GraphQL
                 builder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
+            services.AddScoped<IRepository>(x => x.GetService<ApiContext>());
+
             // GRAPHQL
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
             services.AddScoped<AppSchema>();
@@ -99,11 +103,20 @@ namespace Covid.Api.GraphQL
                 return tracer;
             });
 
+            services.AddOpenTracing();
+
+            // MONGO
+            services.AddScoped<IMongoDatabase>(x => {
+                var client = new MongoClient(this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"));
+                return client.GetDatabase(this.Configuration.GetValue<string>("CountryDatabase:Database"));
+            });
+
+            services.AddScoped<IRepository>(
+                x => new MongoRepository(x.GetRequiredService<IMongoDatabase>()));
+
             // DOMAIN SERVICES
             services.AddSingleton<IFieldService, FieldService>();
-            services.AddScoped<IRepository>(x => x.GetService<ApiContext>());
 
-            services.AddOpenTracing();
             services.AddControllers();
         }
 

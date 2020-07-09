@@ -15,8 +15,11 @@ namespace Covid.Api.GraphQL.Query
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(IRepository sql, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields)
+        public AppQuery(IEnumerable<IRepository> repositories, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields)
         {
+            var dataRepository = repositories.First(x => x is ApiContext);
+            var countryRepository = repositories.First(x => x is MongoRepository);
+
             #region countries
             this.FieldAsync<ListGraphType<CountryType>>(
                 name: "countries",
@@ -33,26 +36,26 @@ namespace Covid.Api.GraphQL.Query
 
                     logger.LogInformation("Getting Country Information");
 
-                    var countries = sql.Query<Country>()
+                    var countries = countryRepository.Query<Country>()
                         .OrderBy(x => x.CountryRegion)
                         .ThenBy(x => x.ProvinceState)
                         .AsQueryable();
 
-                    if (context.TryGetArgument<string>(Parameters.Queries, out var query))
-                    {
-                        query = "%" + query + "%";
-                        countries = countries.Where(
-                            x => EF.Functions.ILike(x.CountryRegion, query)
-                                || EF.Functions.ILike(x.ProvinceState, query)
-                                || EF.Functions.ILike(x.County, query));
-                    }
+                    // if (context.TryGetArgument<string>(Parameters.Queries, out var query))
+                    // {
+                    //     query = "%" + query + "%";
+                    //     countries = countries.Where(
+                    //         x => EF.Functions.ILike(x.CountryRegion, query)
+                    //             || EF.Functions.ILike(x.ProvinceState, query)
+                    //             || EF.Functions.ILike(x.County, query));
+                    // }
 
-                    if (context.TryGetArgument<int>(Parameters.Take, out var take)) countries = countries.Take(take);
-                    if (context.TryGetArgument<int>(Parameters.Skip, out var skip)) countries = countries.Skip(skip);
+                    // if (context.TryGetArgument<int>(Parameters.Take, out var take)) countries = countries.Take(take);
+                    // if (context.TryGetArgument<int>(Parameters.Skip, out var skip)) countries = countries.Skip(skip);
 
-                    return await countries
+                    return countries
                         .OrderBy(x => x.CountryRegion)
-                        .ToListAsync(context.CancellationToken);
+                        .ToList();
                 });
             #endregion
 
@@ -79,7 +82,7 @@ namespace Covid.Api.GraphQL.Query
                     logger.LogInformation("Getting TimeSeries Information");
                     using var _ = logger.BeginScope(context.Arguments);
 
-                    var timeseries = sql.Query<TimeSeries>();
+                    var timeseries = dataRepository.Query<TimeSeries>();
 
                     if (context.TryGetArgument<bool>(Parameters.Chronological, out var chronological) && chronological)
                     {

@@ -7,8 +7,9 @@ import requests
 import shutil
 from sqlalchemy import create_engine
 import snakecase
+import pymongo
 
-from covid import working_directory, DATABASE_CONNECTION_STRING
+from covid import working_directory, DATABASE_CONNECTION_STRING, COUNTRY_CONNECTION_STRING, COUNTRY_COLLECTIONNAME, COUNTRY_DATBASENAME
 from covid.core.tracing import tracer, trace_command_line_arguments
 
 working_sub_directory = os.path.join(working_directory, 'countries')
@@ -62,6 +63,8 @@ if __name__ == "__main__":
 
             frame['ProvinceState'].fillna(value='', inplace=True)
             frame['County'].fillna(value='', inplace=True)
+            frame['iso2'].fillna(value='', inplace=True)
+            frame['iso3'].fillna(value='', inplace=True)
             frame.columns = list(map(snakecase.convert, frame.columns))
 
             if frame.empty:
@@ -75,10 +78,17 @@ if __name__ == "__main__":
                 logger.info(f'Writing {frame.shape[0]} rows to datastore')
 
                 engine = create_engine(args.target_database)
+                mongo = pymongo.MongoClient(COUNTRY_CONNECTION_STRING)
 
-                with engine.begin() as connection:
-                    connection.execute('TRUNCATE TABLE public.country')
-                    frame.to_sql('country', con=connection, if_exists='append', index=False)
+                database = mongo[COUNTRY_DATBASENAME]
+                collection = database[COUNTRY_COLLECTIONNAME]
+
+                logger.info('Dropping %s.%s', COUNTRY_DATBASENAME, COUNTRY_COLLECTIONNAME)
+                collection.drop()
+
+                result = collection.insert_many(frame.to_dict('records'))
+
+                logger.info('Acknowledged %s inserts documents into datastore', len(result.inserted_ids))
 
         elif args.step == 'clean':
             logger.info(f'Cleaning {working_sub_directory}')

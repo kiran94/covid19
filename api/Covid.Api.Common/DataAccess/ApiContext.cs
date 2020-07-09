@@ -1,13 +1,16 @@
 namespace Covid.Api.Common.DataAccess
 {
+    using System.Linq;
     using Covid.Api.Common.Entities;
     using Microsoft.EntityFrameworkCore;
 
-    public class ApiContext : DbContext
+    public class ApiContext : DbContext, IRepository
     {
         public ApiContext(DbContextOptions<ApiContext> context): base(context)
         {
         }
+
+        public new IQueryable<T> Query<T>() where T : class => this.Set<T>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

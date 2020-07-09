@@ -21,11 +21,16 @@ namespace Covid.Api.GraphQL
     using CorrelationId.DependencyInjection;
     using CorrelationId;
     using Covid.Api.Common.Services.Field;
+    using MongoDB.Driver;
+    using MongoDB.Bson.Serialization.Conventions;
+    using MongoDB.Driver.Core.Events;
+    using MongoDB.Bson;
 
     public class Startup
     {
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment Environment { get; }
+        private static string ApplicationName = Assembly.GetEntryAssembly().GetName().Name;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -63,6 +68,8 @@ namespace Covid.Api.GraphQL
                 builder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
 
+            services.AddScoped<IRepository>(x => x.GetService<ApiContext>());
+
             // GRAPHQL
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
             services.AddScoped<AppSchema>();
@@ -99,10 +106,36 @@ namespace Covid.Api.GraphQL
                 return tracer;
             });
 
+            services.AddOpenTracing();
+
+            // MONGO
+            services.AddScoped<IMongoDatabase>(x => {
+
+                var logger = x.GetRequiredService<ILogger<IMongoDatabase>>();
+                var settings = MongoClientSettings.FromConnectionString(System.Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING"));
+                settings.ApplicationName = ApplicationName;
+
+                settings.ClusterConfigurator = cb =>
+                {
+                    cb.Subscribe<CommandStartedEvent>(e =>
+                    {
+                        if (logger.IsEnabled(LogLevel.Information))
+                        {
+                            logger.LogInformation("Mongo Query {0} Running {1}", e.CommandName, e.Command.ToJson());
+                        }
+                    });
+                };
+
+                var client = new MongoClient(settings);
+                return client.GetDatabase(System.Environment.GetEnvironmentVariable("MONGO_DATABASE"));
+            });
+
+            services.AddScoped<IRepository>(
+                x => new MongoRepository(x.GetRequiredService<IMongoDatabase>()));
+
             // DOMAIN SERVICES
             services.AddSingleton<IFieldService, FieldService>();
 
-            services.AddOpenTracing();
             services.AddControllers();
         }
 

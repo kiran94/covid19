@@ -66,6 +66,7 @@ services:
       - elasticsearch
       - kibana
       - jaeger
+      - country_database
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       POSTGRES_HOST: etl_database
@@ -73,14 +74,29 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       COVID_DATABASE_NAME: ${COVID_DATABASE_NAME}
       ELASTICSEARCH_URL: ${ELASTICSEARCH_URL}
+      MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING}
+      MONGO_DATABASE: ${MONGO_DATABASE}
     networks:
       - elastic
       - database
       - tracing
 
+  country_database:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+    volumes:
+      - country_database:/data/db
+    networks:
+      - database
+
 volumes:
   etl_database:
   elasticsearch_database:
+  country_database:
 
 networks:
   elastic:

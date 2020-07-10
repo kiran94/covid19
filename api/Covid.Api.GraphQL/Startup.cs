@@ -22,9 +22,11 @@ namespace Covid.Api.GraphQL
     using CorrelationId;
     using Covid.Api.Common.Services.Field;
     using MongoDB.Driver;
-    using MongoDB.Bson.Serialization.Conventions;
+    using System.Collections.Generic;
     using MongoDB.Driver.Core.Events;
     using MongoDB.Bson;
+    using Covid.Api.Common.Services.Countries;
+    using System.Linq;
 
     public class Startup
     {
@@ -135,6 +137,7 @@ namespace Covid.Api.GraphQL
 
             // DOMAIN SERVICES
             services.AddSingleton<IFieldService, FieldService>();
+            services.AddScoped<ICountryService>(x => new CountryService(x.GetRequiredService<IEnumerable<IRepository>>().First(x => x is MongoRepository)));
 
             services.AddControllers();
         }

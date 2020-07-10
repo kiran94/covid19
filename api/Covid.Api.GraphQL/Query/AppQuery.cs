@@ -12,13 +12,13 @@ namespace Covid.Api.GraphQL.Query
     using System.Collections.Generic;
     using OpenTracing;
     using Covid.Api.Common.Services.Field;
+    using Covid.Api.Common.Services.Countries;
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(IEnumerable<IRepository> repositories, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields)
+        public AppQuery(IEnumerable<IRepository> repositories, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields, ICountryService countriesService)
         {
             var dataRepository = repositories.First(x => x is ApiContext);
-            var countryRepository = repositories.First(x => x is MongoRepository);
 
             #region countries
             this.FieldAsync<ListGraphType<CountryType>>(
@@ -36,26 +36,26 @@ namespace Covid.Api.GraphQL.Query
 
                     logger.LogInformation("Getting Country Information");
 
-                    var countries = countryRepository.Query<Country>()
-                        .OrderBy(x => x.CountryRegion)
-                        .ThenBy(x => x.ProvinceState)
-                        .AsQueryable();
+                    var countries = countriesService.Query();
 
-                    // if (context.TryGetArgument<string>(Parameters.Queries, out var query))
-                    // {
-                    //     query = "%" + query + "%";
-                    //     countries = countries.Where(
-                    //         x => EF.Functions.ILike(x.CountryRegion, query)
-                    //             || EF.Functions.ILike(x.ProvinceState, query)
-                    //             || EF.Functions.ILike(x.County, query));
-                    // }
+                    if (context.TryGetArgument<string>(Parameters.Queries, out var query))
+                    {
+                        countries = countries.Where(x => x.CountryRegion == query);
+                    }
 
-                    // if (context.TryGetArgument<int>(Parameters.Take, out var take)) countries = countries.Take(take);
-                    // if (context.TryGetArgument<int>(Parameters.Skip, out var skip)) countries = countries.Skip(skip);
+                    if (context.TryGetArgument<int>(Parameters.Skip, out var skip)) countries = countries.Skip(skip);
+                    if (context.TryGetArgument<int>(Parameters.Take, out var take)) countries = countries.Take(take);
 
-                    return countries
-                        .OrderBy(x => x.CountryRegion)
-                        .ToList();
+                    countries = countries.OrderBy(x => x.CountryRegion).ThenBy(x => x.ProvinceState);
+
+                    if (countries is IAsyncEnumerable<Country>)
+                    {
+                        return await countries.ToListAsync(context.CancellationToken);
+                    }
+                    else
+                    {
+                        return countries.ToList();
+                    }
                 });
             #endregion
 

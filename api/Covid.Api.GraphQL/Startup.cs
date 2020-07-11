@@ -114,7 +114,7 @@ namespace Covid.Api.GraphQL
             services.AddScoped<IMongoDatabase>(x => {
 
                 var logger = x.GetRequiredService<ILogger<IMongoDatabase>>();
-                var settings = MongoClientSettings.FromConnectionString(System.Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING"));
+                var settings = MongoClientSettings.FromConnectionString(this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"));
                 settings.ApplicationName = ApplicationName;
 
                 settings.ClusterConfigurator = cb =>
@@ -129,7 +129,7 @@ namespace Covid.Api.GraphQL
                 };
 
                 var client = new MongoClient(settings);
-                return client.GetDatabase(System.Environment.GetEnvironmentVariable("MONGO_DATABASE"));
+                return client.GetDatabase(this.Configuration.GetValue<string>("CountryDatabase:DatabaseName"));
             });
 
             services.AddScoped<IRepository>(

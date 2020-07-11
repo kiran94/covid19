@@ -13,6 +13,8 @@ namespace Covid.Api.GraphQL
 
     public class Program
     {
+        static string Environment = System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
         public static void Main(string[] args)
         {
             ConfigureLogger();
@@ -31,12 +33,9 @@ namespace Covid.Api.GraphQL
 
         private static void ConfigureLogger()
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile(
-                    $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
-                    optional: true)
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddJsonFile($"appsettings.{Environment}.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -49,18 +48,18 @@ namespace Covid.Api.GraphQL
                 .Enrich.WithMachineName()
                 .WriteTo.Debug()
                 .WriteTo.Console()
-                .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
-                .Enrich.WithProperty("Environment", environment)
+                .WriteTo.Elasticsearch(ConfigureElasticSink(configuration))
+                .Enrich.WithProperty("Environment", Environment)
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
         }
 
-        private static ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration, string environment)
+        private static ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration)
         {
             return new ElasticsearchSinkOptions(new Uri(configuration.GetValue<string>("ElasticSearch:Url")))
             {
                 AutoRegisterTemplate = true,
-                IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
+                IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{Environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
             };
         }
 
@@ -74,9 +73,7 @@ namespace Covid.Api.GraphQL
                 .ConfigureAppConfiguration(configuration =>
                 {
                     configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                    configuration.AddJsonFile(
-                        $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
-                        optional: true);
+                    configuration.AddJsonFile($"appsettings.{Environment}.json", optional: true, reloadOnChange: true);
                     configuration.AddEnvironmentVariables();
                 })
                 .UseSerilog();

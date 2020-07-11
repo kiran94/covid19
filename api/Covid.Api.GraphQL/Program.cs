@@ -57,8 +57,6 @@ namespace Covid.Api.GraphQL
 
         private static ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration, string environment)
         {
-            Console.WriteLine(configuration.GetValue<string>("ElasticSearch:Url"));
-
             return new ElasticsearchSinkOptions(new Uri(configuration.GetValue<string>("ElasticSearch:Url")))
             {
                 AutoRegisterTemplate = true,

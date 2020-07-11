@@ -13,7 +13,7 @@ This isn't an exhaustive list of all the technologies used in this project. It a
 - `etl/`
   - `python`
   - `pandas`
-- `/api`
+- `api/`
   - `graphql api`
     - `ASP.NET Core`
   - `EF Core`

@@ -53,15 +53,9 @@ namespace Covid.Api.GraphQL
             // EF CORE
             services.AddDbContextPool<ApiContext>(builder =>
             {
-                var host = System.Environment.GetEnvironmentVariable("POSTGRES_HOST");
-                var port = System.Environment.GetEnvironmentVariable("POSTGRES_PORT");
-                var user = System.Environment.GetEnvironmentVariable("POSTGRES_USER");
-                var password = System.Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
-                var database = System.Environment.GetEnvironmentVariable("COVID_DATABASE_NAME");
-
-                builder.UseNpgsql($"Host={host};Database={database};Username={user};Password={password}", options =>
+                builder.UseNpgsql(this.Configuration.GetValue<string>("TimeseriesDatabase:ConnectionString"), options =>
                 {
-                    options.MigrationsAssembly("Covid.Api.GraphQL");
+                    options.MigrationsAssembly(this.Configuration.GetValue<string>("EntityFramework:MigrationAssembly"));
                 });
 
                 builder.UseSnakeCaseNamingConvention();
@@ -114,7 +108,7 @@ namespace Covid.Api.GraphQL
             services.AddScoped<IMongoDatabase>(x => {
 
                 var logger = x.GetRequiredService<ILogger<IMongoDatabase>>();
-                var settings = MongoClientSettings.FromConnectionString(System.Environment.GetEnvironmentVariable("MONGO_CONNECTION_STRING"));
+                var settings = MongoClientSettings.FromConnectionString(this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"));
                 settings.ApplicationName = ApplicationName;
 
                 settings.ClusterConfigurator = cb =>
@@ -129,7 +123,7 @@ namespace Covid.Api.GraphQL
                 };
 
                 var client = new MongoClient(settings);
-                return client.GetDatabase(System.Environment.GetEnvironmentVariable("MONGO_DATABASE"));
+                return client.GetDatabase(this.Configuration.GetValue<string>("CountryDatabase:DatabaseName"));
             });
 
             services.AddScoped<IRepository>(

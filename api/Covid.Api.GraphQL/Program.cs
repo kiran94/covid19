@@ -37,6 +37,7 @@ namespace Covid.Api.GraphQL
                 .AddJsonFile(
                     $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
                     optional: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             Log.Logger = new LoggerConfiguration()
@@ -56,7 +57,9 @@ namespace Covid.Api.GraphQL
 
         private static ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration, string environment)
         {
-            return new ElasticsearchSinkOptions(new Uri(Environment.GetEnvironmentVariable("ELASTICSEARCH_URL")))
+            Console.WriteLine(configuration.GetValue<string>("ElasticSearch:Url"));
+
+            return new ElasticsearchSinkOptions(new Uri(configuration.GetValue<string>("ElasticSearch:Url")))
             {
                 AutoRegisterTemplate = true,
                 IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"

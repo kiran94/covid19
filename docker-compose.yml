@@ -69,8 +69,8 @@ services:
       - country_database
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      ELASTICSEARCH_URL: ${ELASTICSEARCH_URL}
 
+      ElasticSearch__Url: ${ELASTICSEARCH_URL}
       TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
       CountryDatabase__ConnectionString: mongodb://root:rootpassword@country_database:27017
       CountryDatabase__DatabaseName: covid

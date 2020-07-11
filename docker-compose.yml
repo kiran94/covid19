@@ -67,13 +67,15 @@ services:
       - kibana
       - jaeger
       - country_database
+      - fields_database
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-
       ElasticSearch__Url: ${ELASTICSEARCH_URL}
       TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
       CountryDatabase__ConnectionString: mongodb://root:rootpassword@country_database:27017
       CountryDatabase__DatabaseName: covid
+      FieldsDatabase__ConnectionString: mongodb://root:rootpassword@fields_database:27018
+      FieldsDatabase__DatabaseName: covid
     networks:
       - elastic
       - database
@@ -91,10 +93,23 @@ services:
     networks:
       - database
 
+  fields_database:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27018:27017
+    volumes:
+      - fields_database:/data/db
+    networks:
+      - database
+
 volumes:
   etl_database:
   elasticsearch_database:
   country_database:
+  fields_database:
 
 networks:
   elastic:

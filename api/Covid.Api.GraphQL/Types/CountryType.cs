@@ -1,7 +1,7 @@
 namespace Covid.Api.GraphQL.Types
 {
     using System.Collections.Generic;
-    using Covid.Api.Common.Entities;
+    using Covid.Api.Common.Services.Countries;
     using global::GraphQL.Types;
 
     public class CountryType : ObjectGraphType<Country>

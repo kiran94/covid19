@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using Covid.Api.Common.DataAccess.Attribute;
-using MongoDB.Bson.Serialization.Attributes;
-
-namespace Covid.Api.Common.Entities
+namespace Covid.Api.Common.Services.Countries
 {
+    using System.Collections.Generic;
+    using Covid.Api.Common.DataAccess.Attribute;
+    using MongoDB.Bson.Serialization.Attributes;
+
     [MongoCollection("countries")]
     [BsonIgnoreExtraElements]
     public class Country

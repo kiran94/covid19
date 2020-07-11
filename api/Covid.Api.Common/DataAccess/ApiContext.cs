@@ -2,6 +2,7 @@ namespace Covid.Api.Common.DataAccess
 {
     using System.Linq;
     using Covid.Api.Common.Entities;
+    using Covid.Api.Common.Services.Countries;
     using Microsoft.EntityFrameworkCore;
 
     public class ApiContext : DbContext, IRepository

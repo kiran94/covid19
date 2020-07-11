@@ -1,5 +1,6 @@
 namespace Covid.Api.GraphQL.Types
 {
+    using System.Collections.Generic;
     using Covid.Api.Common.Entities;
     using global::GraphQL.Types;
 
@@ -15,6 +16,38 @@ namespace Covid.Api.GraphQL.Types
             this.Field(x => x.Population, nullable: true);
             this.Field(x => x.Iso2, nullable: true);
             this.Field(x => x.Iso3, nullable: true);
+            this.Field(x => x.Region);
+            this.Field(x => x.SubRegion, nullable: true);
+            this.Field(x => x.WorldBankIndex, nullable: true);
+
+            this.Field<List<RegionalBlock>>(
+                x => x.RegionalBlocks,
+                nullable: true,
+                type: typeof(ListGraphType<RegionalBlockCountryType>));
+
+            this.Field<List<Currency>>(
+                x => x.Currencies,
+                nullable: true,
+                type: typeof(ListGraphType<CurrencyType>));
+        }
+    }
+
+    public class RegionalBlockCountryType : ObjectGraphType<RegionalBlock>
+    {
+        public RegionalBlockCountryType()
+        {
+            this.Field(x =>x.Acronym);
+            this.Field(x =>x.Name);
+        }
+    }
+
+    public class CurrencyType : ObjectGraphType<Currency>
+    {
+        public CurrencyType()
+        {
+            this.Field(x => x.Code, nullable: true);
+            this.Field(x => x.Name, nullable: true);
+            this.Field(x => x.Symbol, nullable: true);
         }
     }
 }

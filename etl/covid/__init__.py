@@ -19,16 +19,10 @@ DATABASE_CONNECTION_STRING = os.environ.get(
     'DATABASE_CONNECTION_STRING',
     f'postgresql+pg8000://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}')
 
-MONGO_HOST=os.environ.get('MONGO_HOST')
-MONGO_PORT=int(os.environ.get('MONGO_PORT'))
-MONGO_USERNAME=os.environ.get('MONGO_INITDB_ROOT_USERNAME')
-MONGO_PASSWORD=os.environ.get('MONGO_INITDB_ROOT_PASSWORD')
-
-COUNTRY_DATBASENAME=os.environ.get('COVID_COUNTRY_DATABASE_NAME', 'covid')
+COUNTRY_CONNECTION_STRING=os.environ.get('CountryDatabase__ConnectionString')
+COUNTRY_DATBASENAME=os.environ.get('CountryDatabase__DatabaseName', 'covid')
 COUNTRY_COLLECTIONNAME=os.environ.get('COVID_COUNTRY_COLLECTIONNAME', 'countries')
 
-COUNTRY_CONNECTION_STRING=os.environ.get(
-    'COVID_COUNTRY_CONNECTION_STRING',
-    f'mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/?authSource=admin&readPreference=primary&ssl=false'
-)
-
+FIELDS_CONNECTION_STRING=os.environ.get('FieldsDatabase__ConnectionString')
+FIELDS_DATABASENAME=os.environ.get('FieldsDatabase__DatabaseName', 'covid')
+FIELDS_COLLECTIONNAME=os.environ.get('COVID_FIELDS_COLLECTIONNAME', 'fields')

@@ -139,7 +139,17 @@ namespace Covid.Api.GraphQL.Query
                 description: "Gets Fields tracked under data",
                 resolve: async context => {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
-                    return await fields.GetAll();
+
+                    var retrievedFields = fields.Query();
+
+                    if (retrievedFields is IAsyncEnumerable<Country>)
+                    {
+                        return await retrievedFields.ToListAsync(context.CancellationToken);
+                    }
+                    else
+                    {
+                        return retrievedFields.ToList();
+                    }
                 });
             #endregion
         }

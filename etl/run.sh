@@ -5,6 +5,9 @@ set -e
 # run an entire refresh
 # It also gives a good high level picture on the proceseses involved
 
+# Refresh Fields
+python -m covid.ingest.fields -s refresh --publish
+
 # Fetch Latest Countries
 python -m covid.ingest.countries -s fetch
 python -m covid.ingest.countries -s load --publish

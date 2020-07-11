@@ -19,8 +19,10 @@ DATABASE_CONNECTION_STRING = os.environ.get(
     'DATABASE_CONNECTION_STRING',
     f'postgresql+pg8000://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}')
 
-COUNTRY_COLLECTIONNAME=os.environ.get('COVID_COUNTRY_COLLECTIONNAME', 'countries')
-
 COUNTRY_CONNECTION_STRING=os.environ.get('CountryDatabase__ConnectionString')
 COUNTRY_DATBASENAME=os.environ.get('CountryDatabase__DatabaseName', 'covid')
+COUNTRY_COLLECTIONNAME=os.environ.get('COVID_COUNTRY_COLLECTIONNAME', 'countries')
 
+FIELDS_CONNECTION_STRING=os.environ.get('FieldsDatabase__ConnectionString')
+FIELDS_DATABASENAME=os.environ.get('FieldsDatabase__DatabaseName', 'covid')
+FIELDS_COLLECTIONNAME=os.environ.get('COVID_FIELDS_COLLECTIONNAME', 'fields')

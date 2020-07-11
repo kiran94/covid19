@@ -27,6 +27,7 @@ namespace Covid.Api.GraphQL
     using MongoDB.Bson;
     using Covid.Api.Common.Services.Countries;
     using System.Linq;
+    using Covid.Api.Common.Mongo;
 
     public class Startup
     {
@@ -105,33 +106,13 @@ namespace Covid.Api.GraphQL
             services.AddOpenTracing();
 
             // MONGO
-            services.AddScoped<IMongoDatabase>(x => {
+            services.AddMongoService<IFieldService, FieldService>(
+                this.Configuration.GetValue<string>("FieldsDatabase:ConnectionString"),
+                this.Configuration.GetValue<string>("FieldsDatabase:DatabaseName"));
 
-                var logger = x.GetRequiredService<ILogger<IMongoDatabase>>();
-                var settings = MongoClientSettings.FromConnectionString(this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"));
-                settings.ApplicationName = ApplicationName;
-
-                settings.ClusterConfigurator = cb =>
-                {
-                    cb.Subscribe<CommandStartedEvent>(e =>
-                    {
-                        if (logger.IsEnabled(LogLevel.Information))
-                        {
-                            logger.LogInformation("Mongo Query {0} Running {1}", e.CommandName, e.Command.ToJson());
-                        }
-                    });
-                };
-
-                var client = new MongoClient(settings);
-                return client.GetDatabase(this.Configuration.GetValue<string>("CountryDatabase:DatabaseName"));
-            });
-
-            services.AddScoped<IRepository>(
-                x => new MongoRepository(x.GetRequiredService<IMongoDatabase>()));
-
-            // DOMAIN SERVICES
-            services.AddSingleton<IFieldService, FieldService>();
-            services.AddScoped<ICountryService>(x => new CountryService(x.GetRequiredService<IEnumerable<IRepository>>().First(x => x is MongoRepository)));
+            services.AddMongoService<ICountryService, CountryService>(
+                this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"),
+                this.Configuration.GetValue<string>("CountryDatabase:DatabaseName"));
 
             services.AddControllers();
         }

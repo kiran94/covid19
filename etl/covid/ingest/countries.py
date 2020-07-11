@@ -27,6 +27,10 @@ if __name__ == "__main__":
                         type=str,
                         default='https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv',
                         help='URL of the data source (in CSV format)')
+    parser.add_argument('--url_additional',
+                        type=str,
+                        default='https://restcountries.eu/rest/v2/all',
+                        help='URL of the additional data source')
     parser.add_argument('--publish', action='store_true', help='Actually Publish the results to the datastore?')
     parser.add_argument('--console', action='store_true', help='Print the processed frame to console')
     parser.add_argument('--working_directory', default=working_sub_directory)
@@ -66,6 +70,15 @@ if __name__ == "__main__":
             frame['iso2'].fillna(value='', inplace=True)
             frame['iso3'].fillna(value='', inplace=True)
             frame.columns = list(map(snakecase.convert, frame.columns))
+
+            logger.info('Getting Additional Country Details')
+
+            result = requests.get(args.url_additional).json()
+            additional_frame = pd.DataFrame.from_dict(result)
+            additional_frame.rename(columns={ 'alpha3Code': 'iso3'}, inplace=True)
+            additional_frame.drop(columns=['alpha2Code', 'name', 'population', 'latlng'], inplace=True)
+
+            frame = frame.merge(additional_frame, how='left', on='iso3')
 
             if frame.empty:
                 logger.exception('', ValueError('frame was empty'))

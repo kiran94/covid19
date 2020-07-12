@@ -8,6 +8,7 @@ import shutil
 from sqlalchemy import create_engine
 import snakecase
 import pymongo
+import numpy as np
 
 from covid import working_directory, DATABASE_CONNECTION_STRING, COUNTRY_CONNECTION_STRING, COUNTRY_COLLECTIONNAME, COUNTRY_DATBASENAME
 from covid.core.tracing import tracer, trace_command_line_arguments
@@ -79,6 +80,7 @@ if __name__ == "__main__":
             additional_frame.drop(columns=['alpha2Code', 'name', 'population', 'latlng'], inplace=True)
 
             frame = frame.merge(additional_frame, how='left', on='iso3')
+            frame.fillna('', inplace=True)
 
             if frame.empty:
                 logger.exception('', ValueError('frame was empty'))
@@ -96,10 +98,19 @@ if __name__ == "__main__":
                 database = mongo[COUNTRY_DATBASENAME]
                 collection = database[COUNTRY_COLLECTIONNAME]
 
+                logger.info('Removing Empty Fields')
+                countries = frame.to_dict('records')
+                for country in countries:
+                    for key in list(country):
+                        value = country[key]
+                        if value == '':
+                            del country[key]
+
                 logger.info('Dropping %s.%s', COUNTRY_DATBASENAME, COUNTRY_COLLECTIONNAME)
                 collection.drop()
 
-                result = collection.insert_many(frame.to_dict('records'))
+                logger.info('Writing to data store')
+                result = collection.insert_many(countries)
 
                 logger.info('Acknowledged %s inserts documents into datastore', len(result.inserted_ids))
 

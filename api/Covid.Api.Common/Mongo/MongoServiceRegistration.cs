@@ -16,9 +16,6 @@ namespace Covid.Api.Common.Mongo
             where TService: class
             where TImplementation : TService
             {
-                Console.WriteLine(connectionString);
-                Console.WriteLine(database);
-
                 services.AddSingleton<TService>(x => {
 
                     var settings = MongoClientSettings.FromConnectionString(connectionString);

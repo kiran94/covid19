@@ -9,8 +9,8 @@ namespace Covid.Api.GraphQL.Types
         public CountryType()
         {
             this.Field(x => x.CountryRegion);
-            this.Field(x => x.ProvinceState);
-            this.Field(x => x.County);
+            this.Field(x => x.ProvinceState, nullable: true);
+            this.Field(x => x.County, nullable: true);
             this.Field(x => x.Latitude, nullable: true);
             this.Field(x => x.Longitude, nullable: true);
             this.Field(x => x.Population, nullable: true);
@@ -19,6 +19,7 @@ namespace Covid.Api.GraphQL.Types
             this.Field(x => x.Region);
             this.Field(x => x.SubRegion, nullable: true);
             this.Field(x => x.WorldBankIndex, nullable: true);
+            this.Field(x => x.Borders, nullable: true);
 
             this.Field<List<RegionalBlock>>(
                 x => x.RegionalBlocks,

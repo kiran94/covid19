@@ -68,13 +68,14 @@ services:
       - jaeger
       - country_database
       - fields_database
+      # - cache
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ElasticSearch__Url: ${ELASTICSEARCH_URL}
       TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
       CountryDatabase__ConnectionString: mongodb://root:rootpassword@country_database:27017
       CountryDatabase__DatabaseName: covid
-      FieldsDatabase__ConnectionString: mongodb://root:rootpassword@fields_database:27018
+      FieldsDatabase__ConnectionString: mongodb://root:rootpassword@fields_database:27017
       FieldsDatabase__DatabaseName: covid
     networks:
       - elastic

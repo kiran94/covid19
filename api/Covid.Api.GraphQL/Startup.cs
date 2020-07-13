@@ -21,13 +21,9 @@ namespace Covid.Api.GraphQL
     using CorrelationId.DependencyInjection;
     using CorrelationId;
     using Covid.Api.Common.Services.Field;
-    using MongoDB.Driver;
-    using System.Collections.Generic;
-    using MongoDB.Driver.Core.Events;
-    using MongoDB.Bson;
     using Covid.Api.Common.Services.Countries;
-    using System.Linq;
     using Covid.Api.Common.Mongo;
+    using Covid.Api.Common.Redis;
 
     public class Startup
     {
@@ -113,6 +109,9 @@ namespace Covid.Api.GraphQL
             services.AddMongoService<ICountryService, CountryService>(
                 this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"),
                 this.Configuration.GetValue<string>("CountryDatabase:DatabaseName"));
+
+            // REDIS
+            services.AddRedisCache(this.Configuration.GetSection("Redis"));
 
             services.AddControllers();
         }

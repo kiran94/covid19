@@ -27,4 +27,5 @@ This isn't an exhaustive list of all the technologies used in this project. It a
   - `opentracing` (`Jaeger`)
   - `postgres`
   - `mongo`
+  - `redis`
   - `github actions`

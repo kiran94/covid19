@@ -13,10 +13,18 @@ namespace Covid.Api.GraphQL.Query
     using OpenTracing;
     using Covid.Api.Common.Services.Field;
     using Covid.Api.Common.Services.Countries;
+    using StackExchange.Redis.Extensions.Core.Abstractions;
+    using Covid.Api.Common.Redis;
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(IEnumerable<IRepository> repositories, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields, ICountryService countriesService)
+        public AppQuery(
+            IEnumerable<IRepository> repositories,
+            ILogger<AppQuery> logger,
+            ITracer tracer,
+            IFieldService fields,
+            ICountryService countriesService,
+            IRedisCacheClient redis)
         {
             var dataRepository = repositories.First(x => x is ApiContext);
 
@@ -34,9 +42,18 @@ namespace Covid.Api.GraphQL.Query
                 {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
 
-                    logger.LogInformation("Getting Country Information");
+                    logger.LogDebug("Checking Cache for Country Information");
+                    var cache = redis.GetDatabase(RedisDatabase.Country);
+                    var countries = cache.HashScan<Country>(nameof(CacheHashKey.AllCountries).ToLower(), "*").Select(x => x.Value).AsQueryable();
 
-                    var countries = countriesService.Query();
+                    if (!countries.Any())
+                    {
+                        logger.LogInformation("Fetching Country Information and adding to Cache");
+                         countries = countriesService.Query().ToList().AsQueryable();
+                         await cache.HashSetAsync(
+                             nameof(CacheHashKey.AllCountries).ToLower(),
+                             countries.ToDictionary(x => x.ToCacheKeyString(), x => x));
+                    }
 
                     if (context.TryGetArgument<string>(Parameters.Queries, out var query))
                     {

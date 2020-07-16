@@ -43,8 +43,7 @@ namespace Covid.Api.GraphQL.Query
                 resolve: async context =>
                 {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
-
-                    logger.LogDebug("Checking Cache for Country Information");
+                    logger.LogDebug("Getting Country Information");
 
                     var cache = redis.GetDatabase(RedisDatabase.Country);
                     var countries = await cache.GetOrCacheAside(
@@ -94,7 +93,7 @@ namespace Covid.Api.GraphQL.Query
                 {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
 
-                    logger.LogInformation("Getting TimeSeries Information");
+                    logger.LogDebug("Getting TimeSeries Information");
                     using var _ = logger.BeginScope(context.Arguments);
 
                     var timeseries = dataRepository.Query<TimeSeries>();
@@ -154,6 +153,7 @@ namespace Covid.Api.GraphQL.Query
                 description: "Gets Fields tracked under data",
                 resolve: async context => {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
+                    logger.LogDebug("Getting Fields Information");
 
                     var cache = redis.GetDatabase(RedisDatabase.Fields);
                     var retrievedFields = await cache.GetOrCacheAside(

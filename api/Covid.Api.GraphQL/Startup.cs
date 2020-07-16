@@ -5,20 +5,16 @@ namespace Covid.Api.GraphQL
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.EntityFrameworkCore;
-    using Covid.Api.Common.DataAccess;
     using global::GraphQL;
     using Covid.Api.GraphQL.Schema;
     using global::GraphQL.Server;
     using global::GraphQL.Server.Ui.Playground;
     using Covid.Api.GraphQL.Query;
     using OpenTracing;
-    using System;
     using System.Reflection;
     using Microsoft.Extensions.Logging;
     using OpenTracing.Util;
     using Serilog;
-    using CorrelationId.DependencyInjection;
     using CorrelationId;
     using Covid.Api.Common.Services.Field;
     using Covid.Api.Common.Services.Countries;
@@ -26,6 +22,7 @@ namespace Covid.Api.GraphQL
     using Covid.Api.Common.Redis;
     using Microsoft.FeatureManagement;
     using Covid.Api.Common.Services.TimeSeries;
+    using Covid.Api.Common.Configuration;
 
     public class Startup
     {
@@ -41,29 +38,13 @@ namespace Covid.Api.GraphQL
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // CORRELATION ID
-            services.AddDefaultCorrelationId(options =>
-            {
-                options.AddToLoggingScope = true;
-                options.IncludeInResponse = true;
-                options.CorrelationIdGenerator = () => Guid.NewGuid().ToString();
-            });
+            services.AddFeatureManagement();
+            services.AddCommonCorrelation();
+            services.AddCommonCors();
+            services.AddCommonPostgresDatbase(this.Configuration);
+            services.AddRedisCache(this.Configuration.GetSection("Redis"));
 
-            // EF CORE
-            services.AddDbContextPool<ApiContext>(builder =>
-            {
-                builder.UseNpgsql(this.Configuration.GetValue<string>("TimeseriesDatabase:ConnectionString"), options =>
-                {
-                    options.MigrationsAssembly(this.Configuration.GetValue<string>("EntityFramework:MigrationAssembly"));
-                });
-
-                builder.UseSnakeCaseNamingConvention();
-                builder.EnableDetailedErrors(Environment.IsDevelopment());
-                builder.EnableSensitiveDataLogging(Environment.IsDevelopment());
-                builder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            });
-
-            services.AddScoped<IRepository>(x => x.GetService<ApiContext>());
+            services.AddScoped<ITimeSeriesService, TimeSeriesService>();
 
             // GRAPHQL
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
@@ -73,17 +54,6 @@ namespace Covid.Api.GraphQL
             {
                 options.ExposeExceptions = true;
             }).AddGraphTypes();
-
-            // CORS
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(policy =>
-                {
-                    policy.AllowAnyOrigin();
-                    policy.AllowAnyHeader();
-                    policy.AllowAnyMethod();
-                });
-            });
 
             // OPENTRACING
             services.AddSingleton<ITracer>(provider =>
@@ -112,12 +82,6 @@ namespace Covid.Api.GraphQL
                 this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"),
                 this.Configuration.GetValue<string>("CountryDatabase:DatabaseName"));
 
-            // REDIS
-            services.AddRedisCache(this.Configuration.GetSection("Redis"));
-
-            services.AddFeatureManagement();
-
-            services.AddScoped<ITimeSeriesService, TimeSeriesService>();
             services.AddControllers();
         }
 

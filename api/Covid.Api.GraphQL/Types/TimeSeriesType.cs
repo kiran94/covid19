@@ -1,6 +1,6 @@
 namespace Covid.Api.GraphQL.Types
 {
-    using Covid.Api.Common.Entities;
+    using Covid.Api.Common.Services.TimeSeries;
     using global::GraphQL.Types;
 
     public class TimeSeriesType : ObjectGraphType<TimeSeries>

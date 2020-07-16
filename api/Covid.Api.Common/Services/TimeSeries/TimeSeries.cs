@@ -1,4 +1,4 @@
-namespace Covid.Api.Common.Entities
+namespace Covid.Api.Common.Services.TimeSeries
 {
     using System;
 

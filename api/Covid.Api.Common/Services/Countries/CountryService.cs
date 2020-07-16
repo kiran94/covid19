@@ -2,7 +2,6 @@ namespace Covid.Api.Common.Services.Countries
 {
     using System.Linq;
     using Covid.Api.Common.DataAccess;
-    using Covid.Api.Common.Entities;
 
     /// <summary>
     /// Responsible for retrieving country information.

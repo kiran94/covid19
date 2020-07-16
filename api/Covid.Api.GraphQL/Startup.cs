@@ -25,6 +25,7 @@ namespace Covid.Api.GraphQL
     using Covid.Api.Common.Mongo;
     using Covid.Api.Common.Redis;
     using Microsoft.FeatureManagement;
+    using Covid.Api.Common.Services.TimeSeries;
 
     public class Startup
     {
@@ -116,6 +117,7 @@ namespace Covid.Api.GraphQL
 
             services.AddFeatureManagement();
 
+            services.AddScoped<ITimeSeriesService, TimeSeriesService>();
             services.AddControllers();
         }
 

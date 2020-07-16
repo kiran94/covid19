@@ -3,7 +3,6 @@ namespace Covid.Api.GraphQL.Query
     using System;
     using System.Linq;
     using Covid.Api.Common.DataAccess;
-    using Covid.Api.Common.Entities;
     using Covid.Api.GraphQL.Extensions;
     using Covid.Api.GraphQL.Types;
     using global::GraphQL.Types;
@@ -16,6 +15,7 @@ namespace Covid.Api.GraphQL.Query
     using StackExchange.Redis.Extensions.Core.Abstractions;
     using Covid.Api.Common.Redis;
     using Microsoft.FeatureManagement;
+    using Covid.Api.Common.Services.TimeSeries;
 
     public class AppQuery : ObjectGraphType
     {
@@ -25,6 +25,7 @@ namespace Covid.Api.GraphQL.Query
             ITracer tracer,
             IFieldService fields,
             ICountryService countriesService,
+            ITimeSeriesService timeSeries,
             IRedisCacheClient redis,
             IFeatureManager featureManager)
         {

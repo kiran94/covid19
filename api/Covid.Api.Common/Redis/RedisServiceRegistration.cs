@@ -7,6 +7,7 @@ namespace Covid.Api.Common.Redis
     using StackExchange.Redis.Extensions.Core.Configuration;
     using StackExchange.Redis.Extensions.Core.Implementations;
     using StackExchange.Redis.Extensions.System.Text.Json;
+    using StackExchange.Redis.Extensions.MsgPack;
 
     /// <summary>
     /// Responsible for registering Redis based services.
@@ -20,7 +21,7 @@ namespace Covid.Api.Common.Redis
         {
             services.AddSingleton<IRedisCacheClient, RedisCacheClient>();
             services.AddSingleton<IRedisCacheConnectionPoolManager, RedisCacheConnectionPoolManager>();
-            services.AddSingleton<ISerializer, SystemTextJsonSerializer>();
+            services.AddSingleton<ISerializer, MsgPackObjectSerializer>();
             services.AddSingleton(configuration.Get<RedisConfiguration>());
             return services;
         }

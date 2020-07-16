@@ -1,0 +1,40 @@
+syntax = "proto3";
+option csharp_namespace = "Covid.Api.Grpc";
+
+package covid;
+
+message CovidRequest {
+    string CountryRegion = 1;
+    string ProvinceState = 2;
+    string County = 3;
+    repeated string Fields = 4;
+    oneof Dates {
+        AbsoluteDateRequest absoluteDates = 5;
+        RelativeDateRequest relativeDates = 6;
+    };
+}
+
+message RelativeDateRequest {
+    int32 Start = 1;
+    int32 End = 2;
+}
+
+message AbsoluteDateRequest {
+    repeated string Dates = 1;
+}
+
+message CovidResponse {
+    string CountryRegion = 1;
+    string ProvinceState = 2;
+    string County = 3;
+    string Field = 4;
+    int32 Date = 5;
+}
+
+message CovidResponseCollection {
+    repeated CovidResponse Response = 1;
+}
+
+service CovidService {
+    rpc Get(CovidRequest) returns (CovidResponseCollection);
+}

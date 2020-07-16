@@ -17,10 +17,12 @@ namespace Covid.Api.GraphQL
 
         public static void Main(string[] args)
         {
+            Console.WriteLine("Configuring Logger");
             ConfigureLogger();
 
             try
             {
+                Console.WriteLine("Application Starting");
                 CreateHostBuilder(args).Build().Run();
             }
             catch(Exception ex)

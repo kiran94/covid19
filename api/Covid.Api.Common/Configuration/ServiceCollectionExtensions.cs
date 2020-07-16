@@ -36,7 +36,7 @@ namespace Covid.Api.Common.Configuration
             return services;
         }
 
-        public static IServiceCollection AddCommonPostgresDatbase(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCommonPostgresDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContextPool<ApiContext>(builder =>
             {

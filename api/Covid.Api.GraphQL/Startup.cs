@@ -41,7 +41,7 @@ namespace Covid.Api.GraphQL
             services.AddFeatureManagement();
             services.AddCommonCorrelation();
             services.AddCommonCors();
-            services.AddCommonPostgresDatbase(this.Configuration);
+            services.AddCommonPostgresDatabase(this.Configuration);
             services.AddRedisCache(this.Configuration.GetSection("Redis"));
 
             services.AddScoped<ITimeSeriesService, TimeSeriesService>();

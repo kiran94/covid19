@@ -155,7 +155,12 @@ namespace Covid.Api.GraphQL.Query
                 resolve: async context => {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
 
-                    var retrievedFields = fields.Query();
+                    var cache = redis.GetDatabase(RedisDatabase.Fields);
+                    var retrievedFields = await cache.GetOrCacheAside(
+                        () => fields.Query().ToList().AsQueryable(),
+                        nameof(CacheHashKey.AllFields).ToLower(),
+                        logger: logger,
+                        features: featureManager);
 
                     if (retrievedFields is IAsyncEnumerable<Country>)
                     {

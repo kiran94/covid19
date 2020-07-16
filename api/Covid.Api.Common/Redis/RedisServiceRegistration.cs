@@ -38,7 +38,8 @@ namespace Covid.Api.Common.Redis
     public enum RedisDatabase
     {
         Default = -1,
-        Country = 0
+        Country = 0,
+        Fields = 0
     }
 
     public interface ICacheable
@@ -49,6 +50,7 @@ namespace Covid.Api.Common.Redis
     public enum CacheHashKey
     {
         Default = 0,
-        AllCountries = 1
+        AllCountries = 1,
+        AllFields = 2
     }
 }

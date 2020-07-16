@@ -15,6 +15,7 @@ namespace Covid.Api.GraphQL.Query
     using Covid.Api.Common.Services.Countries;
     using StackExchange.Redis.Extensions.Core.Abstractions;
     using Covid.Api.Common.Redis;
+    using Microsoft.FeatureManagement;
 
     public class AppQuery : ObjectGraphType
     {
@@ -24,7 +25,8 @@ namespace Covid.Api.GraphQL.Query
             ITracer tracer,
             IFieldService fields,
             ICountryService countriesService,
-            IRedisCacheClient redis)
+            IRedisCacheClient redis,
+            IFeatureManager featureManager)
         {
             var dataRepository = repositories.First(x => x is ApiContext);
 
@@ -43,12 +45,25 @@ namespace Covid.Api.GraphQL.Query
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
 
                     logger.LogDebug("Checking Cache for Country Information");
-                    var cache = redis.GetDatabase(RedisDatabase.Country);
 
-                    var countries = await cache.GetOrCacheAside(
-                        () => countriesService.Query().ToList().AsQueryable(),
-                        nameof(CacheHashKey.AllCountries).ToLower(),
-                        logger: logger);
+                    IQueryable<Country> countries;
+                    Func<IQueryable<Country>> countriesRetrieve = () => countriesService.Query().ToList().AsQueryable();
+
+                    if (await featureManager.IsEnabledAsync(nameof(Features.Caching)))
+                    {
+                        Console.WriteLine("Feature enabled");
+
+                        var cache = redis.GetDatabase(RedisDatabase.Country);
+                        countries = await cache.GetOrCacheAside(
+                            countriesRetrieve,
+                            nameof(CacheHashKey.AllCountries).ToLower(),
+                            logger: logger);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Feature not enabled");
+                        countries = countriesRetrieve.Invoke();
+                    }
 
                     if (context.TryGetArgument<string>(Parameters.Queries, out var query))
                     {

@@ -24,6 +24,7 @@ namespace Covid.Api.GraphQL
     using Covid.Api.Common.Services.Countries;
     using Covid.Api.Common.Mongo;
     using Covid.Api.Common.Redis;
+    using Microsoft.FeatureManagement;
 
     public class Startup
     {
@@ -112,6 +113,8 @@ namespace Covid.Api.GraphQL
 
             // REDIS
             services.AddRedisCache(this.Configuration.GetSection("Redis"));
+
+            services.AddFeatureManagement();
 
             services.AddControllers();
         }

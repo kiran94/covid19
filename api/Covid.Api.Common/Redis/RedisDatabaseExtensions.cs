@@ -4,6 +4,7 @@ namespace Covid.Api.Common.Redis
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
+    using Microsoft.FeatureManagement;
     using StackExchange.Redis;
     using StackExchange.Redis.Extensions.Core.Abstractions;
 
@@ -18,14 +19,22 @@ namespace Covid.Api.Common.Redis
             string hashKey,
             string hashPattern = "*",
             Func<T, string> keyBuilder = null,
-            ILogger logger = null)
+            ILogger logger = null,
+            IFeatureManager features = null)
             where T: ICacheable
         {
+            if (features != null && !(await features.IsEnabledAsync(nameof(Features.Caching))))
+            {
+                logger?.LogInformation("Caching was disabled");
+                return fetchDelegate.Invoke();
+            }
+
             if (keyBuilder == null)
             {
                 keyBuilder = x => x.ToCacheKeyString();
             }
 
+            logger?.LogDebug("Retrieving from cache");
             var items = cache.HashScan<T>(hashKey, hashPattern).Select(x => x.Value).AsQueryable();
             if (!items.Any())
             {
@@ -35,6 +44,7 @@ namespace Covid.Api.Common.Redis
                 await cache.HashSetAsync(hashKey, items.ToDictionary(keyBuilder, x => x));
             }
 
+            logger?.LogDebug($"Retrieving {items.Count()} from cache");
             return items;
         }
     }

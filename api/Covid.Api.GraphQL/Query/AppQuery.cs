@@ -46,24 +46,12 @@ namespace Covid.Api.GraphQL.Query
 
                     logger.LogDebug("Checking Cache for Country Information");
 
-                    IQueryable<Country> countries;
-                    Func<IQueryable<Country>> countriesRetrieve = () => countriesService.Query().ToList().AsQueryable();
-
-                    if (await featureManager.IsEnabledAsync(nameof(Features.Caching)))
-                    {
-                        Console.WriteLine("Feature enabled");
-
-                        var cache = redis.GetDatabase(RedisDatabase.Country);
-                        countries = await cache.GetOrCacheAside(
-                            countriesRetrieve,
-                            nameof(CacheHashKey.AllCountries).ToLower(),
-                            logger: logger);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Feature not enabled");
-                        countries = countriesRetrieve.Invoke();
-                    }
+                    var cache = redis.GetDatabase(RedisDatabase.Country);
+                    var countries = await cache.GetOrCacheAside(
+                        () => countriesService.Query().ToList().AsQueryable(),
+                        nameof(CacheHashKey.AllCountries).ToLower(),
+                        logger: logger,
+                        features: featureManager);
 
                     if (context.TryGetArgument<string>(Parameters.Queries, out var query))
                     {

@@ -1,4 +1,4 @@
-namespace Covid.Api.GraphQL
+namespace Covid.Api.Common
 {
     public enum Features
     {

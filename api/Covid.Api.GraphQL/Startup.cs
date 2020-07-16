@@ -52,7 +52,7 @@ namespace Covid.Api.GraphQL
             services.AddScoped<AppQuery>();
             services.AddGraphQL(options =>
             {
-                options.ExposeExceptions = true;
+                options.ExposeExceptions = this.Configuration.GetValue<bool>("GraphQL:ExposeExceptions");
             }).AddGraphTypes();
 
             // OPENTRACING

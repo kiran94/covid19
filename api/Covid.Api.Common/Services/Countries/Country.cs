@@ -2,11 +2,12 @@ namespace Covid.Api.Common.Services.Countries
 {
     using System.Collections.Generic;
     using Covid.Api.Common.DataAccess.Attribute;
+    using Covid.Api.Common.Redis;
     using MongoDB.Bson.Serialization.Attributes;
 
     [MongoCollection("countries")]
     [BsonIgnoreExtraElements]
-    public class Country
+    public class Country : ICacheable
     {
         [BsonElement("country_region")]
         public string CountryRegion { get; set; }
@@ -56,6 +57,16 @@ namespace Covid.Api.Common.Services.Countries
 
         /// <inheritdoc />
         public override string ToString() => $"{this.CountryRegion} - {this.ProvinceState} - {this.County}";
+
+        /// <inheritdoc />
+        public string ToCacheKeyString()
+        {
+            var key = string.Empty;
+            if (!string.IsNullOrWhiteSpace(this.CountryRegion)) key += ":" + this.CountryRegion;
+            if (!string.IsNullOrWhiteSpace(this.ProvinceState)) key += ":" + this.ProvinceState;
+            if (!string.IsNullOrWhiteSpace(this.County)) key += ":" + this.County;
+            return key;
+        }
     }
 
 

@@ -13,10 +13,20 @@ namespace Covid.Api.GraphQL.Query
     using OpenTracing;
     using Covid.Api.Common.Services.Field;
     using Covid.Api.Common.Services.Countries;
+    using StackExchange.Redis.Extensions.Core.Abstractions;
+    using Covid.Api.Common.Redis;
+    using Microsoft.FeatureManagement;
 
     public class AppQuery : ObjectGraphType
     {
-        public AppQuery(IEnumerable<IRepository> repositories, ILogger<AppQuery> logger, ITracer tracer, IFieldService fields, ICountryService countriesService)
+        public AppQuery(
+            IEnumerable<IRepository> repositories,
+            ILogger<AppQuery> logger,
+            ITracer tracer,
+            IFieldService fields,
+            ICountryService countriesService,
+            IRedisCacheClient redis,
+            IFeatureManager featureManager)
         {
             var dataRepository = repositories.First(x => x is ApiContext);
 
@@ -33,10 +43,14 @@ namespace Covid.Api.GraphQL.Query
                 resolve: async context =>
                 {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
+                    logger.LogDebug("Getting Country Information");
 
-                    logger.LogInformation("Getting Country Information");
-
-                    var countries = countriesService.Query();
+                    var cache = redis.GetDatabase(RedisDatabase.Country);
+                    var countries = await cache.GetOrCacheAside(
+                        () => countriesService.Query().ToList().AsQueryable(),
+                        nameof(CacheHashKey.AllCountries).ToLower(),
+                        logger: logger,
+                        features: featureManager);
 
                     if (context.TryGetArgument<string>(Parameters.Queries, out var query))
                     {
@@ -79,7 +93,7 @@ namespace Covid.Api.GraphQL.Query
                 {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
 
-                    logger.LogInformation("Getting TimeSeries Information");
+                    logger.LogDebug("Getting TimeSeries Information");
                     using var _ = logger.BeginScope(context.Arguments);
 
                     var timeseries = dataRepository.Query<TimeSeries>();
@@ -139,8 +153,14 @@ namespace Covid.Api.GraphQL.Query
                 description: "Gets Fields tracked under data",
                 resolve: async context => {
                     tracer.ActiveSpan.SetOperationName("GRAPHQL " + string.Join(".", context.Path)).WithGraphQLTags(context);
+                    logger.LogDebug("Getting Fields Information");
 
-                    var retrievedFields = fields.Query();
+                    var cache = redis.GetDatabase(RedisDatabase.Fields);
+                    var retrievedFields = await cache.GetOrCacheAside(
+                        () => fields.Query().ToList().AsQueryable(),
+                        nameof(CacheHashKey.AllFields).ToLower(),
+                        logger: logger,
+                        features: featureManager);
 
                     if (retrievedFields is IAsyncEnumerable<Country>)
                     {

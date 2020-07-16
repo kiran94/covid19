@@ -44,16 +44,11 @@ namespace Covid.Api.GraphQL.Query
 
                     logger.LogDebug("Checking Cache for Country Information");
                     var cache = redis.GetDatabase(RedisDatabase.Country);
-                    var countries = cache.HashScan<Country>(nameof(CacheHashKey.AllCountries).ToLower(), "*").Select(x => x.Value).AsQueryable();
 
-                    if (!countries.Any())
-                    {
-                        logger.LogInformation("Fetching Country Information and adding to Cache");
-                         countries = countriesService.Query().ToList().AsQueryable();
-                         await cache.HashSetAsync(
-                             nameof(CacheHashKey.AllCountries).ToLower(),
-                             countries.ToDictionary(x => x.ToCacheKeyString(), x => x));
-                    }
+                    var countries = await cache.GetOrCacheAside(
+                        () => countriesService.Query().ToList().AsQueryable(),
+                        nameof(CacheHashKey.AllCountries).ToLower(),
+                        logger: logger);
 
                     if (context.TryGetArgument<string>(Parameters.Queries, out var query))
                     {

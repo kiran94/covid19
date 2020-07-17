@@ -55,7 +55,7 @@ namespace Covid.Api.Grpc.Services
 
             result.ForEach(x =>
             {
-                x.Date = DateTime.SpecifyKind(x.Date.Date, DateTimeKind.Utc);
+                x.Date = DateTime.SpecifyKind(x.Date, DateTimeKind.Utc);
             });
 
             // Construct Response

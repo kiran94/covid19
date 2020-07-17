@@ -58,7 +58,6 @@ namespace Covid.Api.GraphQL
             // OPENTRACING
             services.AddSingleton<ITracer>(provider =>
             {
-                var serviceName = Assembly.GetEntryAssembly().GetName().Name;
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
 
                 var config = Jaeger.Configuration.FromIConfiguration(

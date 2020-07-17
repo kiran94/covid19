@@ -5,21 +5,16 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    // using OpenTracing;
+    using OpenTracing;
     using System.Reflection;
     using Microsoft.Extensions.Logging;
-    // using OpenTracing.Util;
-    // using Serilog;
-    // using CorrelationId;
-    using Covid.Api.Common.Services.Field;
-    using Covid.Api.Common.Services.Countries;
-    using Covid.Api.Common.Mongo;
-    using Covid.Api.Common.Redis;
+    using OpenTracing.Util;
     using Microsoft.FeatureManagement;
     using Covid.Api.Common.Services.TimeSeries;
     using Covid.Api.Common.Configuration;
     using Covid.Api.Grpc.Services;
     using Serilog;
+    using System;
 
     public class Startup
     {
@@ -41,6 +36,28 @@
             services.AddCommonPostgresDatabase(this.Configuration);
             services.AddScoped<ITimeSeriesService, TimeSeriesService>();
 
+            // OPENTRACING
+            services.AddSingleton<ITracer>(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+
+                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_SERVICE_NAME"));
+                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_AGENT_HOST"));
+                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_AGENT_PORT"));
+                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_SAMPLER_TYPE"));
+                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_SAMPLER_PARAM"));
+
+                var config = Jaeger.Configuration.FromIConfiguration(
+                    loggerFactory,
+                    this.Configuration.GetSection("Jaeger"));
+
+                var tracer = config.GetTracer();
+                GlobalTracer.Register(tracer);
+
+                return tracer;
+            });
+
+            services.AddOpenTracing();
             services.AddGrpc();
         }
 

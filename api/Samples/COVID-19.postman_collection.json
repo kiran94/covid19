@@ -82,7 +82,7 @@
 						"body": {
 							"mode": "graphql",
 							"graphql": {
-								"query": "query {\n  countries(query: \"Vietnam\") {\n    latitude,\n    longitude,\n    population\n  }\n}",
+								"query": "query {\n  countries(query: \"Vietnam\") {\n    iso3\n    latitude\n    longitude\n    population\n    region\n    regionalBlocks {\n      name\n    },\n    subRegion,\n    worldBankIndex\n    borders\n  }\n}",
 								"variables": ""
 							},
 							"options": {

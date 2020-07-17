@@ -40,13 +40,6 @@
             services.AddSingleton<ITracer>(provider =>
             {
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-
-                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_SERVICE_NAME"));
-                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_AGENT_HOST"));
-                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_AGENT_PORT"));
-                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_SAMPLER_TYPE"));
-                Console.WriteLine(this.Configuration.GetValue<string>("Jaeger:JAEGER_SAMPLER_PARAM"));
-
                 var config = Jaeger.Configuration.FromIConfiguration(
                     loggerFactory,
                     this.Configuration.GetSection("Jaeger"));

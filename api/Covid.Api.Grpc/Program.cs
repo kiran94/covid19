@@ -78,7 +78,7 @@ namespace Covid.Api.Grpc
                         // visit https://go.microsoft.com/fwlink/?linkid=2099682
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                         {
-                            options.ListenLocalhost(6000, o => o.Protocols = HttpProtocols.Http2);
+                            options.ListenLocalhost(6001, o => o.Protocols = HttpProtocols.Http2);
                         }
                     });
                     webBuilder.UseStartup<Startup>();

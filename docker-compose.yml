@@ -84,6 +84,26 @@ services:
       - database
       - tracing
 
+  grpc_api:
+    build:
+      context: ./api/
+      dockerfile: grpc.Dockerfile
+    ports:
+      - 6000:80
+    depends_on:
+      - etl_database
+      - elasticsearch
+      - kibana
+      - jaeger
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ElasticSearch__Url: ${ELASTICSEARCH_URL}
+      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
+    networks:
+      - elastic
+      - database
+      - tracing
+
   country_database:
     image: mongo:latest
     environment:

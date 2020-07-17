@@ -9,20 +9,33 @@ namespace Covid.Api.Grpc.Services
     using Covid.Api.Common.Services.TimeSeries;
     using Microsoft.EntityFrameworkCore;
     using Google.Protobuf.WellKnownTypes;
+    using OpenTracing;
 
     public class CovidDataService : CovidService.CovidServiceBase
     {
         private readonly ILogger<CovidDataService> logger;
         private readonly ITimeSeriesService timeseries;
+        private readonly ITracer tracer;
 
-        public CovidDataService(ILogger<CovidDataService> logger, ITimeSeriesService timeseries)
+        public CovidDataService(ILogger<CovidDataService> logger, ITimeSeriesService timeseries, ITracer tracer)
         {
             this.logger = logger;
             this.timeseries = timeseries;
+            this.tracer = tracer;
         }
 
         public override async Task<CovidResponseCollection> Get(CovidRequest request, ServerCallContext context)
         {
+            using var span = this.tracer.BuildSpan(nameof(CovidDataService.Get))
+                .WithTag(nameof(request.CountryRegion), request.CountryRegion)
+                .WithTag(nameof(request.ProvinceState), request.ProvinceState)
+                .WithTag(nameof(request.County), request.County)
+                .WithTag(nameof(request.Fields), request.Fields?.ToString())
+                .WithTag(nameof(request.DatesCase), request.DatesCase.ToString())
+                .WithTag(nameof(request.AbsoluteDates), request.AbsoluteDates?.ToString())
+                .WithTag(nameof(request.RelativeDates), request.RelativeDates?.ToString())
+                .StartActive();
+
             // Construct Query
             var data = this.timeseries.Query();
 

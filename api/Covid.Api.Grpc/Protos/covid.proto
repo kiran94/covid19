@@ -1,4 +1,6 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
 option csharp_namespace = "Covid.Api.Grpc";
 
 package covid;
@@ -20,7 +22,7 @@ message RelativeDateRequest {
 }
 
 message AbsoluteDateRequest {
-    repeated string Dates = 1;
+    repeated google.protobuf.Timestamp Dates = 1;
 }
 
 message CovidResponse {
@@ -28,7 +30,8 @@ message CovidResponse {
     string ProvinceState = 2;
     string County = 3;
     string Field = 4;
-    int32 Date = 5;
+    google.protobuf.Timestamp Date = 5;
+    double Value = 6;
 }
 
 message CovidResponseCollection {

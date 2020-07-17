@@ -19,6 +19,7 @@
     using Covid.Api.Common.Services.TimeSeries;
     using Covid.Api.Common.Configuration;
     using Covid.Api.Grpc.Services;
+    using Serilog;
 
     public class Startup
     {
@@ -50,6 +51,7 @@
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseSerilogRequestLogging();
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

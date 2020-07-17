@@ -57,7 +57,7 @@ namespace Covid.Api.Grpc.Services
             {
                 throw new NotImplementedException("Relative Dates not Implemented");
             }
-            else
+            else if(request.AbsoluteDates != null)
             {
                 var dates = request.AbsoluteDates.Dates.Select(x => x.ToDateTime().Date);
                 data = data.Where(x => dates.Contains(x.Date));

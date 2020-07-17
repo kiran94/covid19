@@ -1,0 +1,43 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "Covid.Api.Grpc";
+
+package covid;
+
+message CovidRequest {
+    string CountryRegion = 1;
+    string ProvinceState = 2;
+    string County = 3;
+    repeated string Fields = 4;
+    oneof Dates {
+        AbsoluteDateRequest absoluteDates = 5;
+        RelativeDateRequest relativeDates = 6;
+    };
+}
+
+message RelativeDateRequest {
+    int32 Start = 1;
+    int32 End = 2;
+}
+
+message AbsoluteDateRequest {
+    repeated google.protobuf.Timestamp Dates = 1;
+}
+
+message CovidResponse {
+    string CountryRegion = 1;
+    string ProvinceState = 2;
+    string County = 3;
+    string Field = 4;
+    google.protobuf.Timestamp Date = 5;
+    double Value = 6;
+}
+
+message CovidResponseCollection {
+    repeated CovidResponse Response = 1;
+}
+
+service CovidService {
+    rpc Get(CovidRequest) returns (CovidResponseCollection);
+}

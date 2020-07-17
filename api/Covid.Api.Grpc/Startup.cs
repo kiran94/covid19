@@ -1,28 +1,20 @@
-namespace Covid.Api.GraphQL
+﻿namespace Covid.Api.Grpc
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using global::GraphQL;
-    using Covid.Api.GraphQL.Schema;
-    using global::GraphQL.Server;
-    using global::GraphQL.Server.Ui.Playground;
-    using Covid.Api.GraphQL.Query;
     using OpenTracing;
     using System.Reflection;
     using Microsoft.Extensions.Logging;
     using OpenTracing.Util;
-    using Serilog;
-    using CorrelationId;
-    using Covid.Api.Common.Services.Field;
-    using Covid.Api.Common.Services.Countries;
-    using Covid.Api.Common.Mongo;
-    using Covid.Api.Common.Redis;
     using Microsoft.FeatureManagement;
     using Covid.Api.Common.Services.TimeSeries;
     using Covid.Api.Common.Configuration;
+    using Covid.Api.Grpc.Services;
+    using Serilog;
+    using System;
 
     public class Startup
     {
@@ -42,24 +34,12 @@ namespace Covid.Api.GraphQL
             services.AddCommonCorrelation();
             services.AddCommonCors();
             services.AddCommonPostgresDatabase(this.Configuration);
-            services.AddRedisCache(this.Configuration.GetSection("Redis"));
-
             services.AddScoped<ITimeSeriesService, TimeSeriesService>();
-
-            // GRAPHQL
-            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
-            services.AddScoped<AppSchema>();
-            services.AddScoped<AppQuery>();
-            services.AddGraphQL(options =>
-            {
-                options.ExposeExceptions = this.Configuration.GetValue<bool>("GraphQL:ExposeExceptions");
-            }).AddGraphTypes();
 
             // OPENTRACING
             services.AddSingleton<ITracer>(provider =>
             {
                 var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-
                 var config = Jaeger.Configuration.FromIConfiguration(
                     loggerFactory,
                     this.Configuration.GetSection("Jaeger"));
@@ -71,39 +51,26 @@ namespace Covid.Api.GraphQL
             });
 
             services.AddOpenTracing();
-
-            // MONGO
-            services.AddMongoService<IFieldService, FieldService>(
-                this.Configuration.GetValue<string>("FieldsDatabase:ConnectionString"),
-                this.Configuration.GetValue<string>("FieldsDatabase:DatabaseName"));
-
-            services.AddMongoService<ICountryService, CountryService>(
-                this.Configuration.GetValue<string>("CountryDatabase:ConnectionString"),
-                this.Configuration.GetValue<string>("CountryDatabase:DatabaseName"));
-
-            services.AddControllers();
+            services.AddGrpc();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCorrelationId();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseSerilogRequestLogging();
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-            app.UseCors();
-
-            app.UseGraphQL<AppSchema>();
-            app.UseGraphQLPlayground(options: new GraphQLPlaygroundOptions());
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapGrpcService<CovidDataService>();
+                // endpoints.MapGet("/", async context =>
+                // {
+                //     await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+                // });
             });
         }
     }

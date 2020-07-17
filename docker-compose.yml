@@ -78,6 +78,27 @@ services:
       FieldsDatabase__ConnectionString: mongodb://root:rootpassword@fields_database:27017
       FieldsDatabase__DatabaseName: covid
       Redis__Hosts__0__Host: cache
+      Redis__Hosts__0__Port: 6379
+    networks:
+      - elastic
+      - database
+      - tracing
+
+  grpc_api:
+    build:
+      context: ./api/
+      dockerfile: grpc.Dockerfile
+    ports:
+      - 6000:80
+    depends_on:
+      - etl_database
+      - elasticsearch
+      - kibana
+      - jaeger
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ElasticSearch__Url: ${ELASTICSEARCH_URL}
+      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
     networks:
       - elastic
       - database

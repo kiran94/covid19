@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.Api.GraphQL", "Covid.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.Api.Common", "Covid.Api.Common\Covid.Api.Common.csproj", "{43F3A81E-37BB-4905-A855-3A1DB0630BBD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.Api.Grpc", "Covid.Api.Grpc\Covid.Api.Grpc.csproj", "{09E67FDC-3137-43B8-A172-90807684A5EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{43F3A81E-37BB-4905-A855-3A1DB0630BBD}.Release|x64.Build.0 = Release|Any CPU
 		{43F3A81E-37BB-4905-A855-3A1DB0630BBD}.Release|x86.ActiveCfg = Release|Any CPU
 		{43F3A81E-37BB-4905-A855-3A1DB0630BBD}.Release|x86.Build.0 = Release|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Debug|x64.Build.0 = Debug|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Debug|x86.Build.0 = Debug|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|x64.ActiveCfg = Release|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|x64.Build.0 = Release|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|x86.ActiveCfg = Release|Any CPU
+		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

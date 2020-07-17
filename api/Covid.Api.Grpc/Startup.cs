@@ -1,19 +1,45 @@
 ﻿namespace Covid.Api.Grpc
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    // using OpenTracing;
+    using System.Reflection;
+    using Microsoft.Extensions.Logging;
+    // using OpenTracing.Util;
+    // using Serilog;
+    // using CorrelationId;
+    using Covid.Api.Common.Services.Field;
+    using Covid.Api.Common.Services.Countries;
+    using Covid.Api.Common.Mongo;
+    using Covid.Api.Common.Redis;
+    using Microsoft.FeatureManagement;
+    using Covid.Api.Common.Services.TimeSeries;
+    using Covid.Api.Common.Configuration;
+    using Covid.Api.Grpc.Services;
 
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
+        private static string ApplicationName = Assembly.GetEntryAssembly().GetName().Name;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            this.Configuration = configuration;
+            this.Environment = environment;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddFeatureManagement();
+            services.AddCommonCorrelation();
+            services.AddCommonCors();
+            services.AddCommonPostgresDatabase(this.Configuration);
+            services.AddScoped<ITimeSeriesService, TimeSeriesService>();
+
             services.AddGrpc();
         }
 

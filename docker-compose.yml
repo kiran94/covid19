@@ -78,6 +78,7 @@ services:
       FieldsDatabase__ConnectionString: mongodb://root:rootpassword@fields_database:27017
       FieldsDatabase__DatabaseName: covid
       Redis__Hosts__0__Host: cache
+      Redis__Hosts__0__Port: 6379
     networks:
       - elastic
       - database

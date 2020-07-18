@@ -4,7 +4,10 @@
 
 ## Documentation
 
-[GraphQL API](./api/data/README.md)
+Samples:
+
+- [GraphQL (Postman Collection)](api/Samples/COVID-19.postman_collection.json)
+- [GRPC](api/Samples/Grpc/)
 
 ## Technologies Used
 

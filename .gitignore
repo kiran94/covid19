@@ -595,3 +595,5 @@ sw.*
 
 etl/data/countries
 etl/data/timeseries
+
+api/Samples/Grpc/.vscode

@@ -19,6 +19,8 @@ This isn't an exhaustive list of all the technologies used in this project. It a
 - `api/`
   - `graphql api`
     - `ASP.NET Core`
+  - `grpc api`
+    - `ASP.NET Core`
   - `EF Core`
 - `ui/`
   - `NuxtJS`

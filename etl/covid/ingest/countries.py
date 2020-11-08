@@ -5,7 +5,6 @@ import pandas as pd
 import os
 import requests
 import shutil
-from sqlalchemy import create_engine
 import snakecase
 import pymongo
 import numpy as np
@@ -36,7 +35,6 @@ if __name__ == "__main__":
     parser.add_argument('--console', action='store_true', help='Print the processed frame to console')
     parser.add_argument('--working_directory', default=working_sub_directory)
     parser.add_argument('--working_file', default='UID_ISO_FIPS_LookUp_Table.csv')
-    parser.add_argument('--target_database', default=DATABASE_CONNECTION_STRING, help='Target Database to write results')
 
     args = parser.parse_args()
 
@@ -92,7 +90,6 @@ if __name__ == "__main__":
             if args.publish:
                 logger.info(f'Writing {frame.shape[0]} rows to datastore')
 
-                engine = create_engine(args.target_database)
                 mongo = pymongo.MongoClient(COUNTRY_CONNECTION_STRING)
 
                 database = mongo[COUNTRY_DATBASENAME]

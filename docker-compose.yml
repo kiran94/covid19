@@ -18,14 +18,14 @@ services:
       - cache
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      ElasticSearch__Url: ${ELASTICSEARCH_URL}
-      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
-      CountryDatabase__ConnectionString: mongodb://root:rootpassword@country_database:27017
-      CountryDatabase__DatabaseName: covid
-      FieldsDatabase__ConnectionString: mongodb://root:rootpassword@fields_database:27017
-      FieldsDatabase__DatabaseName: covid
-      Redis__Hosts__0__Host: cache
-      Redis__Hosts__0__Port: 6379
+      ElasticSearch__Url: ${ElasticSearch__Url}
+      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=${PGUSER};Password=${PGPASSWORD};Database=${PGDATABASE}
+      CountryDatabase__ConnectionString: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@country_database:27017
+      CountryDatabase__DatabaseName: ${CountryDatabase__DatabaseName}
+      FieldsDatabase__ConnectionString: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@fields_database:27017
+      FieldsDatabase__DatabaseName: ${CountryDatabase__DatabaseName}
+      Redis__Hosts__0__Host: ${Redis__Hosts__0__Host}
+      Redis__Hosts__0__Port: ${Redis__Hosts__0__Port}
     networks:
       - elastic
       - database
@@ -64,18 +64,18 @@ services:
     networks:
       - database
 
-  # jaeger:
-  #   image: jaegertracing/all-in-one:latest
-  #   ports:
-  #       - "5775:5775/udp"
-  #       - "6831:6831/udp"
-  #       - "6832:6832/udp"
-  #       - "5778:5778"
-  #       - "16686:16686" # UI
-  #       - "14268:14268"
-  #       - "9411:9411"
-  #   networks:
-  #     - tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+        - "5775:5775/udp"
+        - "6831:6831/udp"
+        - "6832:6832/udp"
+        - "5778:5778"
+        - "16686:16686" # UI
+        - "14268:14268"
+        - "9411:9411"
+    networks:
+      - tracing
 
   country_database:
     image: mongo:latest
@@ -133,7 +133,7 @@ services:
     depends_on:
       - elasticsearch
     environment:
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
+      - ELASTICSEARCH_URL=${ElasticSearch__Url}
     networks:
       - elastic
 

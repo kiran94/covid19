@@ -45,7 +45,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ElasticSearch__Url: ${ELASTICSEARCH_URL}
-      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
+      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=${PGUSER};Password=${PGPASSWORD};Database=${PGDATABASE}
     networks:
       - elastic
       - database

@@ -18,14 +18,14 @@ services:
       - cache
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      ElasticSearch__Url: ${ELASTICSEARCH_URL}
-      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
-      CountryDatabase__ConnectionString: mongodb://root:rootpassword@country_database:27017
-      CountryDatabase__DatabaseName: covid
-      FieldsDatabase__ConnectionString: mongodb://root:rootpassword@fields_database:27017
-      FieldsDatabase__DatabaseName: covid
-      Redis__Hosts__0__Host: cache
-      Redis__Hosts__0__Port: 6379
+      ElasticSearch__Url: ${ElasticSearch__Url}
+      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=${PGUSER};Password=${PGPASSWORD};Database=${PGDATABASE}
+      CountryDatabase__ConnectionString: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@country_database:27017
+      CountryDatabase__DatabaseName: ${CountryDatabase__DatabaseName}
+      FieldsDatabase__ConnectionString: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@fields_database:27017
+      FieldsDatabase__DatabaseName: ${CountryDatabase__DatabaseName}
+      Redis__Hosts__0__Host: ${Redis__Hosts__0__Host}
+      Redis__Hosts__0__Port: ${Redis__Hosts__0__Port}
     networks:
       - elastic
       - database
@@ -45,7 +45,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ElasticSearch__Url: ${ELASTICSEARCH_URL}
-      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=postgres;Password=password;Database=covid
+      TimeseriesDatabase__ConnectionString: Host=etl_database;Username=${PGUSER};Password=${PGPASSWORD};Database=${PGDATABASE}
     networks:
       - elastic
       - database
@@ -58,9 +58,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: covid
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: ${PGDATABASE}
     networks:
       - database
 
@@ -80,8 +80,8 @@ services:
   country_database:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - 27017:27017
     volumes:
@@ -92,8 +92,8 @@ services:
   fields_database:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
       - 27018:27017
     volumes:
@@ -133,7 +133,7 @@ services:
     depends_on:
       - elasticsearch
     environment:
-      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
+      - ELASTICSEARCH_URL=${ElasticSearch__Url}
     networks:
       - elastic
 

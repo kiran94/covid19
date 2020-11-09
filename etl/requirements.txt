@@ -1,6 +1,7 @@
 requests
 pandas
 SQLAlchemy
+psycopg2
 pg8000
 rainbow_logging_handler
 snakecase

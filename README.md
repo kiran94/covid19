@@ -11,6 +11,8 @@ Samples:
 
 ## Technologies Used
 
+![SystemDiagram](docs/SystemDiagram.png)
+
 This isn't an exhaustive list of all the technologies used in this project. It aims to provide a concise summary on some of the biggest ones and where they are used.
 
 - `etl/`

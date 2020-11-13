@@ -1,5 +1,5 @@
 # Create a Container for the Build Process
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS builder
 
 # Set Build Environment Variables
 ENV ASPNETCORE_CONFIGURATION=Release
@@ -8,18 +8,16 @@ ENV ASPNETCORE_CONFIGURATION=Release
 WORKDIR app
 
 # Copy the contents of the current host directory into the container's working directory
-
-
 COPY ./Covid.Api.Common /Covid.Api.Common
 COPY ./Covid.Api.GraphQL /Covid.Api.GraphQL
 
 WORKDIR /Covid.Api.GraphQL
 
 # Restore Nuget Packages
-RUN dotnet restore
+RUN dotnet restore --runtime linux-x64
 
-# Publish DLL
-RUN dotnet publish -c Release -o /app/out --no-restore
+# Publish Executable
+RUN dotnet publish -c Release --self-contained --runtime linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=True -o /app/out --no-restore
 
 #################################################################
 
@@ -40,4 +38,4 @@ ENV ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
 # Expose Port
 EXPOSE 80/tcp
 
-ENTRYPOINT ["dotnet", "Covid.Api.GraphQL.dll"]
+CMD ["./Covid.Api.GraphQL"]

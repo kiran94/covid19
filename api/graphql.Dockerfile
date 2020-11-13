@@ -1,5 +1,5 @@
 # Create a Container for the Build Process
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS builder
 
 # Set Build Environment Variables
 ENV ASPNETCORE_CONFIGURATION=Release
@@ -24,7 +24,7 @@ RUN dotnet publish -c Release -o /app/out --no-restore
 #################################################################
 
 # Switch to the runtime container
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
 # Switch container's working directory
 WORKDIR /app

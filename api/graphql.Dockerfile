@@ -8,8 +8,6 @@ ENV ASPNETCORE_CONFIGURATION=Release
 WORKDIR app
 
 # Copy the contents of the current host directory into the container's working directory
-
-
 COPY ./Covid.Api.Common /Covid.Api.Common
 COPY ./Covid.Api.GraphQL /Covid.Api.GraphQL
 
@@ -18,8 +16,8 @@ WORKDIR /Covid.Api.GraphQL
 # Restore Nuget Packages
 RUN dotnet restore
 
-# Publish DLL
-RUN dotnet publish -c Release -o /app/out --no-restore
+# Publish Executable
+RUN dotnet publish -c Release --self-contained --runtime linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=True -o /app/out
 
 #################################################################
 
@@ -40,4 +38,4 @@ ENV ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
 # Expose Port
 EXPOSE 80/tcp
 
-ENTRYPOINT ["dotnet", "Covid.Api.GraphQL.dll"]
+CMD ["./Covid.Api.GraphQL"]

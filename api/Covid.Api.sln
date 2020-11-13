@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Covid.Api.GraphQL", "Covid.Api.GraphQL\Covid.Api.GraphQL.csproj", "{66D80EB3-58EF-4EE3-A14A-0D336154BD1A}"
 EndProject
@@ -17,9 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{66D80EB3-58EF-4EE3-A14A-0D336154BD1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -58,5 +55,11 @@ Global
 		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|x64.Build.0 = Release|Any CPU
 		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|x86.ActiveCfg = Release|Any CPU
 		{09E67FDC-3137-43B8-A172-90807684A5EC}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DC40E904-F63F-4457-A855-5CED6337D2C8}
 	EndGlobalSection
 EndGlobal

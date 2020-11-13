@@ -6,5 +6,6 @@ Assuming setup has already been completed, run `dotnet run`
 
 Then install and run [`grpcui`](https://github.com/fullstorydev/grpcui#installation)
 
-`grpcui -plaintext localhost:6002
+```sh
+grpcui -plaintext localhost:6002
 ```

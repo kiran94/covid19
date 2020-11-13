@@ -1,5 +1,5 @@
 # Create a Container for the Build Process
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS builder
 
 # Set Build Environment Variables
 ENV ASPNETCORE_CONFIGURATION=Release

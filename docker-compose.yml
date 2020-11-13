@@ -44,7 +44,7 @@ services:
       - jaeger
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      ElasticSearch__Url: ${ELASTICSEARCH_URL}
+      ElasticSearch__Url: ${ElasticSearch__Url}
       TimeseriesDatabase__ConnectionString: Host=etl_database;Username=${PGUSER};Password=${PGPASSWORD};Database=${PGDATABASE}
     networks:
       - elastic

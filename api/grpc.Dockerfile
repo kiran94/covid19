@@ -1,5 +1,5 @@
 # Create a Container for the Build Process
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS builder
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS builder
 
 # Set Build Environment Variables
 ENV ASPNETCORE_CONFIGURATION=Release
@@ -14,10 +14,10 @@ COPY ./Covid.Api.Grpc /Covid.Api.Grpc
 WORKDIR /Covid.Api.Grpc
 
 # Restore Nuget Packages
-RUN dotnet restore
+RUN dotnet restore --runtime linux-x64
 
 # Publish Executable
-RUN dotnet publish -c Release --self-contained --runtime linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=True -o /app/out
+RUN dotnet publish -c Release --self-contained --runtime linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=True -o /app/out --no-restore
 
 #################################################################
 

@@ -24,7 +24,7 @@ namespace Covid.Api.Grpc.Services
             this.tracer = tracer;
         }
 
-        public override async Task<CovidResponseCollection> Get(CovidRequest request, ServerCallContext context)
+        public override async Task Get(CovidRequest request, IServerStreamWriter<CovidResponse> responseStream, ServerCallContext context)
         {
             using var span = this.tracer.BuildSpan(nameof(CovidDataService.Get))
                 .WithTag(nameof(request.CountryRegion), request.CountryRegion)
@@ -36,16 +36,17 @@ namespace Covid.Api.Grpc.Services
                 .WithTag(nameof(request.RelativeDates), request.RelativeDates?.ToString())
                 .StartActive();
 
-            // Construct Query
             var data = this.timeseries.Query();
 
             if (!string.IsNullOrWhiteSpace(request.CountryRegion))
+            {
                 data = data.Where(x => x.CountryRegion == request.CountryRegion);
+            }
 
             request.ProvinceState = request.ProvinceState ?? "";
-            data = data.Where(x => x.ProvinceState == request.ProvinceState);
-
             request.County = request.County ?? "";
+
+            data = data.Where(x => x.ProvinceState == request.ProvinceState);
             data = data.Where(x => x.County == request.County);
 
             if (request.Fields.Any())
@@ -63,29 +64,20 @@ namespace Covid.Api.Grpc.Services
                 data = data.Where(x => dates.Contains(x.Date));
             }
 
-            // Get Data
-            var result = await data.ToListAsync(context.CancellationToken);
-
-            result.ForEach(x =>
+            await foreach (var record in data.AsAsyncEnumerable())
             {
-                x.Date = DateTime.SpecifyKind(x.Date, DateTimeKind.Utc);
-            });
+                var c = new CovidResponse()
+                {
+                    CountryRegion = record.CountryRegion,
+                    ProvinceState = record.ProvinceState,
+                    County = record.County,
+                    Field = record.Field,
+                    Date =  Timestamp.FromDateTime(DateTime.SpecifyKind(record.Date, DateTimeKind.Utc)),
+                    Value = record.Value ?? 0
+                };
 
-            // Construct Response
-            var covidResponses = result.Select(x => new CovidResponse()
-            {
-                CountryRegion = x.CountryRegion,
-                ProvinceState = x.ProvinceState,
-                County = x.County,
-                Field = x.Field,
-                Date =  Timestamp.FromDateTime(x.Date),
-                Value = x.Value ?? 0
-            }).ToList();
-
-            var covidResponsesCollection = new CovidResponseCollection();
-            covidResponsesCollection.Response.AddRange(covidResponses);
-
-            return covidResponsesCollection;
+               await responseStream.WriteAsync(c);
+            }
         }
     }
 }

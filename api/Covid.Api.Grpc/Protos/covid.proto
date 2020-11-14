@@ -34,10 +34,6 @@ message CovidResponse {
     double Value = 6;
 }
 
-message CovidResponseCollection {
-    repeated CovidResponse Response = 1;
-}
-
 service CovidService {
-    rpc Get(CovidRequest) returns (CovidResponseCollection);
+    rpc Get(CovidRequest) returns (stream CovidResponse);
 }

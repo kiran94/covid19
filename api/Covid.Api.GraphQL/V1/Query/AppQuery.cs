@@ -1,10 +1,9 @@
-namespace Covid.Api.GraphQL.Query
+namespace Covid.Api.GraphQL.V1.Query
 {
     using System;
     using System.Linq;
     using Covid.Api.Common.DataAccess;
     using Covid.Api.GraphQL.Extensions;
-    using Covid.Api.GraphQL.Types;
     using global::GraphQL.Types;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
@@ -16,6 +15,7 @@ namespace Covid.Api.GraphQL.Query
     using Covid.Api.Common.Redis;
     using Microsoft.FeatureManagement;
     using Covid.Api.Common.Services.TimeSeries;
+    using Covid.Api.GraphQL.V1.Types;
 
     public class AppQuery : ObjectGraphType
     {
@@ -149,7 +149,7 @@ namespace Covid.Api.GraphQL.Query
             #endregion
 
             #region fields
-            this.FieldAsync<ListGraphType<GraphQL.Types.FieldType>>(
+            this.FieldAsync<ListGraphType<GraphQL.V1.Types.FieldType>>(
                 "fields",
                 description: "Gets Fields tracked under data",
                 resolve: async context => {

@@ -2,7 +2,7 @@ namespace Covid.Api.GraphQL.Extensions
 {
     using System.Collections.Generic;
     using System.Linq;
-    using global::GraphQL.Types;
+    using global::GraphQL;
     using OpenTracing;
 
     public static class GraphQLExtensions
@@ -10,7 +10,7 @@ namespace Covid.Api.GraphQL.Extensions
         /// <summary>
         /// Checks if the given argument exists, if it exists, the value of the argument is set into value.
         /// </summary>
-        public static bool TryGetArgument<T>(this ResolveFieldContext<object> context, string field, out T value)
+        public static bool TryGetArgument<T>(this IResolveFieldContext<object> context, string field, out T value)
         {
             if (context.HasArgument(field))
             {
@@ -22,7 +22,7 @@ namespace Covid.Api.GraphQL.Extensions
             return false;
         }
 
-        public static ISpan WithGraphQLTags(this ISpan span, ResolveFieldContext<object> context)
+        public static ISpan WithGraphQLTags(this ISpan span, IResolveFieldContext<object> context)
         {
             if (context.Arguments == null || context.Arguments.Count == 0) return span;
 

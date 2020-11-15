@@ -5,11 +5,6 @@ namespace Covid.Api.GraphQL
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using global::GraphQL;
-    using Covid.Api.GraphQL.Schema;
-    using global::GraphQL.Server;
-    using global::GraphQL.Server.Ui.Playground;
-    using Covid.Api.GraphQL.Query;
     using OpenTracing;
     using System.Reflection;
     using Microsoft.Extensions.Logging;
@@ -23,6 +18,7 @@ namespace Covid.Api.GraphQL
     using Microsoft.FeatureManagement;
     using Covid.Api.Common.Services.TimeSeries;
     using Covid.Api.Common.Configuration;
+    using Covid.Api.GraphQL.V1;
 
     public class Startup
     {
@@ -47,13 +43,7 @@ namespace Covid.Api.GraphQL
             services.AddScoped<ITimeSeriesService, TimeSeriesService>();
 
             // GRAPHQL
-            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
-            services.AddScoped<AppSchema>();
-            services.AddScoped<AppQuery>();
-            services.AddGraphQL(options =>
-            {
-                options.ExposeExceptions = this.Configuration.GetValue<bool>("GraphQL:ExposeExceptions");
-            }).AddGraphTypes();
+            services.AddGraphQLV1(this.Configuration);
 
             // OPENTRACING
             services.AddSingleton<ITracer>(provider =>
@@ -98,8 +88,7 @@ namespace Covid.Api.GraphQL
             app.UseRouting();
             app.UseCors();
 
-            app.UseGraphQL<AppSchema>();
-            app.UseGraphQLPlayground(options: new GraphQLPlaygroundOptions());
+            app.UseGraphQLV1();
 
             app.UseEndpoints(endpoints =>
             {

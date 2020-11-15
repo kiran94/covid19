@@ -47,13 +47,25 @@ namespace Covid.Api.GraphQL
             services.AddScoped<ITimeSeriesService, TimeSeriesService>();
 
             // GRAPHQL
-            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(s.GetRequiredService));
             services.AddScoped<AppSchema>();
             services.AddScoped<AppQuery>();
             services.AddGraphQL(options =>
             {
-                options.ExposeExceptions = this.Configuration.GetValue<bool>("GraphQL:ExposeExceptions");
-            }).AddGraphTypes();
+                options.EnableMetrics = this.Configuration.GetValue<bool>("GraphQL:EnableMetrics");
+            })
+            .AddErrorInfoProvider(options => 
+            {
+                var exposeException = this.Configuration.GetValue<bool>("GraphQL:ExposeExceptions");
+                options.ExposeCode = exposeException;
+                options.ExposeData = exposeException;
+                options.ExposeExceptionStackTrace = exposeException;
+                options.ExposeExtensions = exposeException;
+                options.ExposeCodes = exposeException;
+
+                options.ExposeExceptionStackTrace = exposeException;
+            })
+            .AddSystemTextJson()
+            .AddGraphTypes();
 
             // OPENTRACING
             services.AddSingleton<ITracer>(provider =>

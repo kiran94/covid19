@@ -1,4 +1,4 @@
-namespace Covid.Api.GraphQL.Types
+namespace Covid.Api.GraphQL.V1.Types
 {
     using System.Collections.Generic;
     using Covid.Api.Common.Services.Countries;

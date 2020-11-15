@@ -1,4 +1,4 @@
-namespace Covid.Api.GraphQL.Query
+namespace Covid.Api.GraphQL.V1.Query
 {
     using System.Collections.Generic;
     using global::GraphQL.Types;

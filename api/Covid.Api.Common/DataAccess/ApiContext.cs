@@ -10,7 +10,7 @@ namespace Covid.Api.Common.DataAccess
         {
         }
 
-        public new IQueryable<T> Query<T>() where T : class => this.Set<T>();
+        public IQueryable<T> Query<T>() where T : class => this.Set<T>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
